@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/servicedesk
+    username: servicedesk
+    password: servicedesk
+  mail:
+    host: localhost
+    port: 1025
+
+app:
+  jwt:
+    secret: local-dev-secret-change-me-32chars-minimum
