@@ -9,4 +9,4 @@ spring:
 
 app:
   jwt:
-    secret: local-dev-secret-change-me-32chars-minimum
+    secret: TbfIE4WxhDctTTA6jOe1gfRf4FIimZlqY8hV6hxolfw=

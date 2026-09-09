@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "ServicedeskApplication (local)",
+            "request": "launch",
+            "mainClass": "com.tcc.servicedesk.ServicedeskApplication",
+            "projectName": "servicedesk",
+            "env": {
+                "SPRING_PROFILES_ACTIVE": "local"
+            }
+        }
+    ]
+}

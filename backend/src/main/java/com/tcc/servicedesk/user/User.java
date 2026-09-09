@@ -4,8 +4,6 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hibernate.annotations.ManyToAny;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -41,7 +39,7 @@ public class User {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @Column(name = "fullname" , nullable = false)
+    @Column(name = "full_name" , nullable = false)
     private String fullName;
 
     @Column(name = "avatar_url")
@@ -49,7 +47,7 @@ public class User {
 
     @Column(name = "active", nullable = false)
     @Builder.Default
-    private boolean avtive = true;
+    private boolean active = true;
 
     @Column(name = "deleted" , nullable = false)
     @Builder.Default
