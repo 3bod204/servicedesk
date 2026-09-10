@@ -23,6 +23,7 @@
     <springdoc.version>2.6.0</springdoc.version>
     <shedlock.version>5.16.0</shedlock.version>
     <testcontainers.version>1.21.4</testcontainers.version>
+    <lombok.version>1.18.46</lombok.version>
   </properties>
 
   <dependencies>
