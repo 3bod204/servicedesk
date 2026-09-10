@@ -3,6 +3,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "ServicedeskApplication",
+            "request": "launch",
+            "mainClass": "com.tcc.servicedesk.ServicedeskApplication",
+            "projectName": "taskforge-backend"
+        },
+        {
+            "type": "java",
             "name": "ServicedeskApplication (local)",
             "request": "launch",
             "mainClass": "com.tcc.servicedesk.ServicedeskApplication",
