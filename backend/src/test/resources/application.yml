@@ -5,6 +5,6 @@ spring:
 
 app:
   jwt:
-    secret: test-secret
+    secret: test-secret-key-value-that-is-long-enough-for-hmac-sha256-signing
     access-token-minutes: 15
     refresh-token-days: 7
