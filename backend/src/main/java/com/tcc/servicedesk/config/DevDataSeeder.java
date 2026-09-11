@@ -1,5 +1,7 @@
 package com.tcc.servicedesk.config;
 
+import com.tcc.servicedesk.user.Role;
+import com.tcc.servicedesk.user.RoleRepository;
 import com.tcc.servicedesk.user.User;
 import com.tcc.servicedesk.user.UserRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -14,10 +16,16 @@ import java.time.Instant;
 public class DevDataSeeder implements CommandLineRunner {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public DevDataSeeder(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public DevDataSeeder(
+            UserRepository userRepository,
+            RoleRepository roleRepository,
+            PasswordEncoder passwordEncoder
+    ) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -36,7 +44,11 @@ public class DevDataSeeder implements CommandLineRunner {
                 .updatedAt(Instant.now())
                 .build();
 
+        Role adminRole = roleRepository.findByName("ROLE_ADMIN")
+                .orElseThrow(() -> new IllegalStateException("ROLE_ADMIN not seeded"));
+        user.getRoles().add(adminRole);
+
         userRepository.save(user);
-        System.out.println("Seeded test user: agent@tcc.sa / Password123!");
+        System.out.println("Seeded test user: agent@tcc.sa / Password123! (ROLE_ADMIN)");
     }
 }
