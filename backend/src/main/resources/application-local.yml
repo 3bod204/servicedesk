@@ -10,3 +10,9 @@ spring:
 app:
   jwt:
     secret: TbfIE4WxhDctTTA6jOe1gfRf4FIimZlqY8hV6hxolfw=
+  storage:
+    bucket: servicedesk-attachments
+    endpoint: http://localhost:9000
+    access-key: minioadmin
+    secret-key: minioadmin
+    region: us-east-1
