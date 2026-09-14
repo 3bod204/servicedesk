@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
@@ -44,6 +45,7 @@ public class TicketService {
         this.auditEntryRepository = auditEntryRepository;
     }
 
+    @Transactional
     public TicketResponse createTicket(Long requesterId, CreateTicketRequest request) {
 
         User requester = userRepository.findById(requesterId)
@@ -70,6 +72,8 @@ public class TicketService {
                 .category(category)
                 .queue(category.getQueue())
                 .requester(requester)
+                .createdAt(now)
+                .updatedAt(now)
                 .firstResponseDueAt(now.plus(slaPolicy.getFirstResponseMinutes(), ChronoUnit.MINUTES))
                 .slaDueAt(now.plus(slaPolicy.getResolutionMinutes(), ChronoUnit.MINUTES))
                 .build();
