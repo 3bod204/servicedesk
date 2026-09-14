@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Service
 public class TicketService {
@@ -211,31 +212,51 @@ public class TicketService {
         return toResponse(ticket);
     }
 
+    @Transactional(readOnly = true)
     public Page<TicketResponse> searchTickets(
-            UserPrincipal caller,
-            TicketSearchCriteria criteria,
-            Pageable pageable
-    ) {
-        boolean isRequesterOnly = caller.getAuthorities().stream()
-                .map(a -> a.getAuthority())
-                .allMatch(role -> role.equals("ROLE_REQUESTER"));
+        UserPrincipal caller,
+        TicketSearchCriteria criteria,
+        Pageable pageable
+) {
+    List<String> callerRoles = caller.getAuthorities().stream()
+            .map(a -> a.getAuthority())
+            .toList();
 
-        Long effectiveRequesterId = isRequesterOnly ? caller.getId() : null;
+    boolean isRequesterOnly = callerRoles.stream()
+            .allMatch(role -> role.equals("ROLE_REQUESTER"));
 
-        Specification<Ticket> spec = Specification
-                .where(TicketSpecifications.notDeleted())
-                .and(TicketSpecifications.hasStatus(criteria.status()))
-                .and(TicketSpecifications.hasPriority(criteria.priority()))
-                .and(TicketSpecifications.hasQueue(criteria.queueId()))
-                .and(TicketSpecifications.hasAssignee(criteria.assigneeId()))
-                .and(TicketSpecifications.hasCategory(criteria.categoryId()))
-                .and(TicketSpecifications.hasRequester(effectiveRequesterId))
-                .and(TicketSpecifications.createdBetween(criteria.createdFrom(), criteria.createdTo()))
-                .and(TicketSpecifications.searchText(criteria.search()));
+    boolean isAgentOnly = callerRoles.contains("ROLE_AGENT")
+            && !callerRoles.contains("ROLE_MANAGER")
+            && !callerRoles.contains("ROLE_ADMIN");
 
-        return ticketRepository.findAll(spec, pageable)
-                .map(this::toResponse);
+    Long effectiveRequesterId = isRequesterOnly ? caller.getId() : null;
+
+    Specification<Ticket> spec = Specification
+            .where(TicketSpecifications.notDeleted())
+            .and(TicketSpecifications.hasStatus(criteria.status()))
+            .and(TicketSpecifications.hasPriority(criteria.priority()))
+            .and(TicketSpecifications.hasQueue(criteria.queueId()))
+            .and(TicketSpecifications.hasAssignee(criteria.assigneeId()))
+            .and(TicketSpecifications.hasCategory(criteria.categoryId()))
+            .and(TicketSpecifications.hasRequester(effectiveRequesterId))
+            .and(TicketSpecifications.createdBetween(criteria.createdFrom(), criteria.createdTo()))
+            .and(TicketSpecifications.searchText(criteria.search()));
+
+    if (isAgentOnly) {
+        User agent = userRepository.findById(caller.getId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "User not found"));
+
+        List<Long> agentQueueIds = agent.getQueues().stream()
+                .map(Queue::getId)
+                .toList();
+
+        spec = spec.and(TicketSpecifications.hasQueueIn(agentQueueIds));
     }
+
+    return ticketRepository.findAll(spec, pageable)
+            .map(this::toResponse);
+}
 
     private TicketResponse toResponse(Ticket ticket) {
         return new TicketResponse(

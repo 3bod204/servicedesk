@@ -2,6 +2,7 @@ package com.tcc.servicedesk.ticket;
 
 import org.springframework.data.jpa.domain.Specification;
 import java.time.Instant;
+import java.util.List;
 
 public final class TicketSpecifications {
 
@@ -61,4 +62,11 @@ public final class TicketSpecifications {
     public static Specification<Ticket> notDeleted() {
         return (root, query, cb) -> cb.equal(root.get("deleted"), false);
     }
+
+    public static Specification<Ticket> hasQueueIn(List<Long> queueIds) {
+    return (root, query, cb) ->
+            (queueIds == null || queueIds.isEmpty())
+                ? cb.disjunction()
+                : root.get("queue").get("id").in(queueIds);
+}
 }
