@@ -83,6 +83,7 @@ public class TicketService {
         return toResponse(ticket);
     }
 
+    @Transactional
     public TicketResponse changeStatus(Long ticketId, Long actingUserId, UpdateStatusRequest request) {
 
         Ticket ticket = ticketRepository.findById(ticketId)
@@ -140,6 +141,7 @@ public class TicketService {
         }
 
         ticket.setStatus(newStatus);
+        ticket.setUpdatedAt(now);
 
         auditEntryRepository.save(AuditEntry.builder()
                 .ticket(ticket)
@@ -153,6 +155,7 @@ public class TicketService {
         return toResponse(ticket);
     }
 
+    @Transactional
     public TicketResponse assignTicket(Long ticketId, Long actingUserId, AssignTicketRequest request) {
 
         Ticket ticket = ticketRepository.findById(ticketId)
@@ -176,8 +179,11 @@ public class TicketService {
                     "Assignee is not a member of this ticket's queue");
         }
 
+        Instant now = Instant.now();
+
         User previousAssignee = ticket.getAssignee();
         ticket.setAssignee(newAssignee);
+        ticket.setUpdatedAt(now);
 
         auditEntryRepository.save(AuditEntry.builder()
                 .ticket(ticket)
@@ -185,7 +191,7 @@ public class TicketService {
                 .field("assignee")
                 .oldValue(previousAssignee != null ? previousAssignee.getEmail() : null)
                 .newValue(newAssignee.getEmail())
-                .createdAt(Instant.now())
+                .createdAt(now)
                 .build());
 
         if (ticket.getStatus() == TicketStatus.NEW) {
@@ -198,7 +204,7 @@ public class TicketService {
                     .field("status")
                     .oldValue(oldStatus.name())
                     .newValue(TicketStatus.ASSIGNED.name())
-                    .createdAt(Instant.now())
+                    .createdAt(now)
                     .build());
         }
 
