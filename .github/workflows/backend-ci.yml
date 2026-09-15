@@ -75,14 +75,22 @@ jobs:
   image-build:
     needs: security-scan
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
-      - name: Build Docker image
-        run: |
-          docker build -t servicedesk-backend:${{ github.sha }} backend/
-      - name: Save image as artifact
-        run: docker save servicedesk-backend:${{ github.sha }} -o backend-image.tar
-      - uses: actions/upload-artifact@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          name: backend-image
-          path: backend-image.tar
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: backend
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/servicedesk-backend:${{ github.sha }}
