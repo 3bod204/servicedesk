@@ -4,12 +4,11 @@ import com.tcc.servicedesk.user.Role;
 import com.tcc.servicedesk.user.RoleRepository;
 import com.tcc.servicedesk.user.User;
 import com.tcc.servicedesk.user.UserRepository;
+import java.time.Instant;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import java.time.Instant;
 
 @Component
 @Profile("local")
@@ -22,8 +21,7 @@ public class DevDataSeeder implements CommandLineRunner {
     public DevDataSeeder(
             UserRepository userRepository,
             RoleRepository roleRepository,
-            PasswordEncoder passwordEncoder
-    ) {
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -35,17 +33,20 @@ public class DevDataSeeder implements CommandLineRunner {
             return;
         }
 
-        User user = User.builder()
-                .email("agent@tcc.sa")
-                .passwordHash(passwordEncoder.encode("Password123!"))
-                .fullName("Test Agent")
-                .active(true)
-                .createdAt(Instant.now())
-                .updatedAt(Instant.now())
-                .build();
+        User user =
+                User.builder()
+                        .email("agent@tcc.sa")
+                        .passwordHash(passwordEncoder.encode("Password123!"))
+                        .fullName("Test Agent")
+                        .active(true)
+                        .createdAt(Instant.now())
+                        .updatedAt(Instant.now())
+                        .build();
 
-        Role adminRole = roleRepository.findByName("ROLE_ADMIN")
-                .orElseThrow(() -> new IllegalStateException("ROLE_ADMIN not seeded"));
+        Role adminRole =
+                roleRepository
+                        .findByName("ROLE_ADMIN")
+                        .orElseThrow(() -> new IllegalStateException("ROLE_ADMIN not seeded"));
         user.getRoles().add(adminRole);
 
         userRepository.save(user);

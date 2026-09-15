@@ -6,8 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ServicedeskApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ServicedeskApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(ServicedeskApplication.class, args);
+    }
 }

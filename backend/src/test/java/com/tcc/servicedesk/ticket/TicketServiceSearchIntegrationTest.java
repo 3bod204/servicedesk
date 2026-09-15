@@ -24,9 +24,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Exercises TicketService#searchTickets against a real Postgres instance (via
- * Testcontainers) because the agent queue-scoping behavior is expressed as a
- * JPA Specification and cannot be meaningfully verified with mocks.
+ * Exercises TicketService#searchTickets against a real Postgres instance (via Testcontainers)
+ * because the agent queue-scoping behavior is expressed as a JPA Specification and cannot be
+ * meaningfully verified with mocks.
  */
 @SpringBootTest
 @Import(TestcontainersConfiguration.class)
@@ -50,44 +50,58 @@ class TicketServiceSearchIntegrationTest {
         serviceDeskQueue = queueRepository.findByName("Service Desk").orElseThrow();
         networkQueue = queueRepository.findByName("Network").orElseThrow();
 
-        serviceDeskCategory = categoryRepository.findAll().stream()
-                .filter(c -> c.getQueue().getId().equals(serviceDeskQueue.getId()))
-                .findFirst()
-                .orElseThrow();
-        networkCategory = categoryRepository.findAll().stream()
-                .filter(c -> c.getQueue().getId().equals(networkQueue.getId()))
-                .findFirst()
-                .orElseThrow();
+        serviceDeskCategory =
+                categoryRepository.findAll().stream()
+                        .filter(c -> c.getQueue().getId().equals(serviceDeskQueue.getId()))
+                        .findFirst()
+                        .orElseThrow();
+        networkCategory =
+                categoryRepository.findAll().stream()
+                        .filter(c -> c.getQueue().getId().equals(networkQueue.getId()))
+                        .findFirst()
+                        .orElseThrow();
 
-        requester = userRepository.save(User.builder()
-                .email("requester-" + System.nanoTime() + "@test.com")
-                .passwordHash("hash")
-                .fullName("Test Requester")
-                .roles(Set.of(roleRepository.findByName("ROLE_REQUESTER").orElseThrow()))
-                .createdAt(Instant.now())
-                .updatedAt(Instant.now())
-                .build());
+        requester =
+                userRepository.save(
+                        User.builder()
+                                .email("requester-" + System.nanoTime() + "@test.com")
+                                .passwordHash("hash")
+                                .fullName("Test Requester")
+                                .roles(
+                                        Set.of(
+                                                roleRepository
+                                                        .findByName("ROLE_REQUESTER")
+                                                        .orElseThrow()))
+                                .createdAt(Instant.now())
+                                .updatedAt(Instant.now())
+                                .build());
 
-        ticketService.createTicket(requester.getId(),
-                new CreateTicketRequest("Service desk issue", "desc", serviceDeskCategory.getId(), Priority.LOW));
-        ticketService.createTicket(requester.getId(),
-                new CreateTicketRequest("Network issue", "desc", networkCategory.getId(), Priority.LOW));
+        ticketService.createTicket(
+                requester.getId(),
+                new CreateTicketRequest(
+                        "Service desk issue", "desc", serviceDeskCategory.getId(), Priority.LOW));
+        ticketService.createTicket(
+                requester.getId(),
+                new CreateTicketRequest(
+                        "Network issue", "desc", networkCategory.getId(), Priority.LOW));
     }
 
     private User createUser(String emailPrefix, Set<Queue> queues, String... roleNames) {
-        Set<Role> roles = Set.of(roleNames).stream()
-                .map(name -> roleRepository.findByName(name).orElseThrow())
-                .collect(java.util.stream.Collectors.toSet());
+        Set<Role> roles =
+                Set.of(roleNames).stream()
+                        .map(name -> roleRepository.findByName(name).orElseThrow())
+                        .collect(java.util.stream.Collectors.toSet());
 
-        return userRepository.save(User.builder()
-                .email(emailPrefix + "-" + System.nanoTime() + "@test.com")
-                .passwordHash("hash")
-                .fullName(emailPrefix)
-                .roles(roles)
-                .queues(queues)
-                .createdAt(Instant.now())
-                .updatedAt(Instant.now())
-                .build());
+        return userRepository.save(
+                User.builder()
+                        .email(emailPrefix + "-" + System.nanoTime() + "@test.com")
+                        .passwordHash("hash")
+                        .fullName(emailPrefix)
+                        .roles(roles)
+                        .queues(queues)
+                        .createdAt(Instant.now())
+                        .updatedAt(Instant.now())
+                        .build());
     }
 
     private UserPrincipal principalFor(User user) {
@@ -99,12 +113,11 @@ class TicketServiceSearchIntegrationTest {
         User agent = createUser("agent", Set.of(serviceDeskQueue), "ROLE_AGENT");
 
         Pageable pageable = PageRequest.of(0, 20);
-        TicketSearchCriteria criteria = new TicketSearchCriteria(
-                null, null, null, null, null, null, null, null);
+        TicketSearchCriteria criteria =
+                new TicketSearchCriteria(null, null, null, null, null, null, null, null);
 
-        List<TicketResponse> results = ticketService
-                .searchTickets(principalFor(agent), criteria, pageable)
-                .getContent();
+        List<TicketResponse> results =
+                ticketService.searchTickets(principalFor(agent), criteria, pageable).getContent();
 
         assertThat(results).isNotEmpty();
         assertThat(results).allMatch(t -> t.queueName().equals("Service Desk"));
@@ -115,12 +128,11 @@ class TicketServiceSearchIntegrationTest {
         User agent = createUser("lonelyagent", Set.of(), "ROLE_AGENT");
 
         Pageable pageable = PageRequest.of(0, 20);
-        TicketSearchCriteria criteria = new TicketSearchCriteria(
-                null, null, null, null, null, null, null, null);
+        TicketSearchCriteria criteria =
+                new TicketSearchCriteria(null, null, null, null, null, null, null, null);
 
-        List<TicketResponse> results = ticketService
-                .searchTickets(principalFor(agent), criteria, pageable)
-                .getContent();
+        List<TicketResponse> results =
+                ticketService.searchTickets(principalFor(agent), criteria, pageable).getContent();
 
         assertThat(results).isEmpty();
     }
@@ -130,12 +142,11 @@ class TicketServiceSearchIntegrationTest {
         User manager = createUser("manager", Set.of(serviceDeskQueue), "ROLE_MANAGER");
 
         Pageable pageable = PageRequest.of(0, 20);
-        TicketSearchCriteria criteria = new TicketSearchCriteria(
-                null, null, null, null, null, null, null, null);
+        TicketSearchCriteria criteria =
+                new TicketSearchCriteria(null, null, null, null, null, null, null, null);
 
-        List<TicketResponse> results = ticketService
-                .searchTickets(principalFor(manager), criteria, pageable)
-                .getContent();
+        List<TicketResponse> results =
+                ticketService.searchTickets(principalFor(manager), criteria, pageable).getContent();
 
         assertThat(results.stream().map(TicketResponse::queueName))
                 .contains("Service Desk", "Network");
@@ -145,16 +156,19 @@ class TicketServiceSearchIntegrationTest {
     void requesterOnlySeesOwnTickets() {
         User otherRequester = createUser("other", Set.of(), "ROLE_REQUESTER");
 
-        ticketService.createTicket(otherRequester.getId(),
-                new CreateTicketRequest("Other's ticket", "desc", serviceDeskCategory.getId(), Priority.LOW));
+        ticketService.createTicket(
+                otherRequester.getId(),
+                new CreateTicketRequest(
+                        "Other's ticket", "desc", serviceDeskCategory.getId(), Priority.LOW));
 
         Pageable pageable = PageRequest.of(0, 20);
-        TicketSearchCriteria criteria = new TicketSearchCriteria(
-                null, null, null, null, null, null, null, null);
+        TicketSearchCriteria criteria =
+                new TicketSearchCriteria(null, null, null, null, null, null, null, null);
 
-        List<TicketResponse> results = ticketService
-                .searchTickets(principalFor(requester), criteria, pageable)
-                .getContent();
+        List<TicketResponse> results =
+                ticketService
+                        .searchTickets(principalFor(requester), criteria, pageable)
+                        .getContent();
 
         assertThat(results).allMatch(t -> t.requesterId().equals(requester.getId()));
     }

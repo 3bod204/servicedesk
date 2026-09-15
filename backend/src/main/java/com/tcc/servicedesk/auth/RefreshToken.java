@@ -2,8 +2,8 @@ package com.tcc.servicedesk.auth;
 
 import com.tcc.servicedesk.user.User;
 import jakarta.persistence.*;
-import lombok.*;
 import java.time.Instant;
+import lombok.*;
 
 @Entity
 @Table(name = "refresh_tokens")
@@ -34,7 +34,7 @@ public class RefreshToken {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-    public void revoke(){
+    public void revoke() {
         this.revoked = true;
     }
 }

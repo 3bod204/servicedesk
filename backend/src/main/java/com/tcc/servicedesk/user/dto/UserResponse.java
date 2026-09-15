@@ -8,5 +8,4 @@ public record UserResponse(
         String fullName,
         String avatarUrl,
         boolean active,
-        Set<String> roles
-) {}
+        Set<String> roles) {}

@@ -5,7 +5,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "queues")
-@Data 
+@Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder

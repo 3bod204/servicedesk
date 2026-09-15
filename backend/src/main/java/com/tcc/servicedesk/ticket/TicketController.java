@@ -5,13 +5,9 @@ import com.tcc.servicedesk.ticket.dto.CreateTicketRequest;
 import com.tcc.servicedesk.ticket.dto.TicketResponse;
 import com.tcc.servicedesk.ticket.dto.TicketSearchCriteria;
 import com.tcc.servicedesk.ticket.dto.UpdateStatusRequest;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import jakarta.validation.Valid;
-
-
-
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -30,26 +26,23 @@ public class TicketController {
     @ResponseStatus(HttpStatus.CREATED)
     public TicketResponse createTicket(
             @AuthenticationPrincipal UserPrincipal principal,
-            @Valid @RequestBody CreateTicketRequest request
-    ) {
+            @Valid @RequestBody CreateTicketRequest request) {
         return ticketService.createTicket(principal.getId(), request);
     }
 
-   @PutMapping("/{id}/status")
+    @PutMapping("/{id}/status")
     public TicketResponse changeStatus(
-        @AuthenticationPrincipal UserPrincipal principal,
-        @PathVariable Long id,
-        @Valid @RequestBody UpdateStatusRequest request
-) {
-    return ticketService.changeStatus(id, principal.getId(), request);
-}
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateStatusRequest request) {
+        return ticketService.changeStatus(id, principal.getId(), request);
+    }
 
-@GetMapping
-public Page<TicketResponse> searchTickets(
-        @AuthenticationPrincipal UserPrincipal principal,
-        @ModelAttribute TicketSearchCriteria criteria,
-        Pageable pageable
-) {
-    return ticketService.searchTickets(principal, criteria, pageable);
-}
+    @GetMapping
+    public Page<TicketResponse> searchTickets(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @ModelAttribute TicketSearchCriteria criteria,
+            Pageable pageable) {
+        return ticketService.searchTickets(principal, criteria, pageable);
+    }
 }

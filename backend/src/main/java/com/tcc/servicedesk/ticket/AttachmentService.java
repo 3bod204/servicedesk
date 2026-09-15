@@ -5,17 +5,16 @@ import com.tcc.servicedesk.storage.StorageService;
 import com.tcc.servicedesk.ticket.dto.AttachmentResponse;
 import com.tcc.servicedesk.user.User;
 import com.tcc.servicedesk.user.UserRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
-
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class AttachmentService {
@@ -38,8 +37,7 @@ public class AttachmentService {
             UserRepository userRepository,
             AuditEntryRepository auditEntryRepository,
             StorageService storageService,
-            FileContentValidator fileContentValidator
-    ) {
+            FileContentValidator fileContentValidator) {
         this.attachmentRepository = attachmentRepository;
         this.ticketRepository = ticketRepository;
         this.userRepository = userRepository;
@@ -50,22 +48,32 @@ public class AttachmentService {
 
     @Transactional
     public AttachmentResponse uploadAttachment(
-            Long ticketId, UserPrincipal caller, MultipartFile file
-    ) {
-        Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Ticket not found"));
+            Long ticketId, UserPrincipal caller, MultipartFile file) {
+        Ticket ticket =
+                ticketRepository
+                        .findById(ticketId)
+                        .orElseThrow(
+                                () ->
+                                        new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND, "Ticket not found"));
 
-        User uploader = userRepository.findById(caller.getId())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "User not found"));
+        User uploader =
+                userRepository
+                        .findById(caller.getId())
+                        .orElseThrow(
+                                () ->
+                                        new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND, "User not found"));
 
         checkUploadPermission(ticket, caller);
 
-        if (attachmentRepository.countByTicketIdAndDeletedFalse(ticketId) >= MAX_ATTACHMENTS_PER_TICKET) {
+        if (attachmentRepository.countByTicketIdAndDeletedFalse(ticketId)
+                >= MAX_ATTACHMENTS_PER_TICKET) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "This ticket already has the maximum of " + MAX_ATTACHMENTS_PER_TICKET + " attachments");
+                    "This ticket already has the maximum of "
+                            + MAX_ATTACHMENTS_PER_TICKET
+                            + " attachments");
         }
 
         if (file.isEmpty()) {
@@ -75,7 +83,8 @@ public class AttachmentService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File exceeds 10 MB limit");
         }
 
-        String originalFilename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "unnamed";
+        String originalFilename =
+                file.getOriginalFilename() != null ? file.getOriginalFilename() : "unnamed";
         String extension = extractExtension(originalFilename);
 
         if (!ALLOWED_EXTENSIONS.contains(extension)) {
@@ -87,7 +96,8 @@ public class AttachmentService {
         try {
             content = file.getBytes();
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not read file");
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, "Could not read file");
         }
 
         FileContentValidator.DetectedType detected = fileContentValidator.detect(content);
@@ -97,11 +107,12 @@ public class AttachmentService {
                     HttpStatus.BAD_REQUEST, "File content does not match any supported type");
         }
 
-        boolean categoryMatches = switch (extension) {
-            case "jpg", "jpeg" -> detected.category().equals("jpg");
-            case "txt", "log" -> detected.category().equals("text");
-            default -> detected.category().equals(extension);
-        };
+        boolean categoryMatches =
+                switch (extension) {
+                    case "jpg", "jpeg" -> detected.category().equals("jpg");
+                    case "txt", "log" -> detected.category().equals("text");
+                    default -> detected.category().equals(extension);
+                };
 
         if (!categoryMatches) {
             throw new ResponseStatusException(
@@ -109,38 +120,45 @@ public class AttachmentService {
                     "File content does not match its extension (." + extension + ")");
         }
 
-        String storageKey = "tickets/" + ticketId + "/" + UUID.randomUUID() + "-" + sanitize(originalFilename);
+        String storageKey =
+                "tickets/" + ticketId + "/" + UUID.randomUUID() + "-" + sanitize(originalFilename);
 
         storageService.upload(storageKey, content, detected.contentType());
 
-        Attachment attachment = Attachment.builder()
-                .ticket(ticket)
-                .filename(originalFilename)
-                .contentType(detected.contentType())
-                .sizeBytes(content.length)
-                .storageKey(storageKey)
-                .uploadedBy(uploader)
-                .build();
+        Attachment attachment =
+                Attachment.builder()
+                        .ticket(ticket)
+                        .filename(originalFilename)
+                        .contentType(detected.contentType())
+                        .sizeBytes(content.length)
+                        .storageKey(storageKey)
+                        .uploadedBy(uploader)
+                        .build();
 
         attachmentRepository.save(attachment);
 
-        auditEntryRepository.save(AuditEntry.builder()
-                .ticket(ticket)
-                .actor(uploader)
-                .field("attachment")
-                .oldValue(null)
-                .newValue(originalFilename)
-                .createdAt(Instant.now())
-                .build());
+        auditEntryRepository.save(
+                AuditEntry.builder()
+                        .ticket(ticket)
+                        .actor(uploader)
+                        .field("attachment")
+                        .oldValue(null)
+                        .newValue(originalFilename)
+                        .createdAt(Instant.now())
+                        .build());
 
         return toResponse(attachment);
     }
 
     @Transactional(readOnly = true)
     public List<AttachmentResponse> listAttachments(Long ticketId, UserPrincipal caller) {
-        Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Ticket not found"));
+        Ticket ticket =
+                ticketRepository
+                        .findById(ticketId)
+                        .orElseThrow(
+                                () ->
+                                        new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND, "Ticket not found"));
 
         checkViewPermission(ticket, caller);
 
@@ -153,9 +171,13 @@ public class AttachmentService {
 
     @Transactional(readOnly = true)
     public DownloadedFile downloadAttachment(Long attachmentId, UserPrincipal caller) {
-        Attachment attachment = attachmentRepository.findById(attachmentId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Attachment not found"));
+        Attachment attachment =
+                attachmentRepository
+                        .findById(attachmentId)
+                        .orElseThrow(
+                                () ->
+                                        new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND, "Attachment not found"));
 
         checkViewPermission(attachment.getTicket(), caller);
 
@@ -205,7 +227,6 @@ public class AttachmentService {
                 attachment.getSizeBytes(),
                 attachment.getUploadedBy().getId(),
                 attachment.getUploadedBy().getFullName(),
-                attachment.getUploadedAt()
-        );
+                attachment.getUploadedAt());
     }
 }

@@ -45,13 +45,14 @@ class AttachmentServiceTest {
 
     @BeforeEach
     void setUp() {
-        attachmentService = new AttachmentService(
-                attachmentRepository,
-                ticketRepository,
-                userRepository,
-                auditEntryRepository,
-                storageService,
-                fileContentValidator);
+        attachmentService =
+                new AttachmentService(
+                        attachmentRepository,
+                        ticketRepository,
+                        userRepository,
+                        auditEntryRepository,
+                        storageService,
+                        fileContentValidator);
 
         requester = User.builder().id(1L).email("req@test.com").fullName("Req Ester").build();
         agent = User.builder().id(2L).email("agent@test.com").fullName("Agent Smith").build();
@@ -59,9 +60,10 @@ class AttachmentServiceTest {
     }
 
     private UserPrincipal principalWithRoles(User user, String... roleNames) {
-        user.setRoles(Arrays.stream(roleNames)
-                .map(name -> Role.builder().id(1L).name(name).build())
-                .collect(Collectors.toSet()));
+        user.setRoles(
+                Arrays.stream(roleNames)
+                        .map(name -> Role.builder().id(1L).name(name).build())
+                        .collect(Collectors.toSet()));
         return new UserPrincipal(user);
     }
 
@@ -70,7 +72,8 @@ class AttachmentServiceTest {
     @Test
     void uploadSucceedsForOwningRequester() {
         UserPrincipal caller = principalWithRoles(requester, "ROLE_REQUESTER");
-        MockMultipartFile file = new MockMultipartFile("file", "doc.pdf", "application/pdf", PDF_BYTES);
+        MockMultipartFile file =
+                new MockMultipartFile("file", "doc.pdf", "application/pdf", PDF_BYTES);
 
         when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
         when(userRepository.findById(1L)).thenReturn(Optional.of(requester));
@@ -81,16 +84,22 @@ class AttachmentServiceTest {
         assertThat(response.filename()).isEqualTo("doc.pdf");
         assertThat(response.contentType()).isEqualTo("application/pdf");
         assertThat(response.uploadedById()).isEqualTo(1L);
-        verify(storageService).upload(anyString(), any(byte[].class), org.mockito.ArgumentMatchers.eq("application/pdf"));
+        verify(storageService)
+                .upload(
+                        anyString(),
+                        any(byte[].class),
+                        org.mockito.ArgumentMatchers.eq("application/pdf"));
         verify(attachmentRepository).save(any(Attachment.class));
         verify(auditEntryRepository).save(any(AuditEntry.class));
     }
 
     @Test
     void uploadRejectsRequesterUploadingToSomeoneElsesTicket() {
-        User otherRequester = User.builder().id(99L).email("other@test.com").fullName("Other").build();
+        User otherRequester =
+                User.builder().id(99L).email("other@test.com").fullName("Other").build();
         UserPrincipal caller = principalWithRoles(otherRequester, "ROLE_REQUESTER");
-        MockMultipartFile file = new MockMultipartFile("file", "doc.pdf", "application/pdf", PDF_BYTES);
+        MockMultipartFile file =
+                new MockMultipartFile("file", "doc.pdf", "application/pdf", PDF_BYTES);
 
         when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
         when(userRepository.findById(99L)).thenReturn(Optional.of(otherRequester));
@@ -106,7 +115,8 @@ class AttachmentServiceTest {
     @Test
     void uploadAllowsAgentOnAnyTicket() {
         UserPrincipal caller = principalWithRoles(agent, "ROLE_AGENT");
-        MockMultipartFile file = new MockMultipartFile("file", "doc.pdf", "application/pdf", PDF_BYTES);
+        MockMultipartFile file =
+                new MockMultipartFile("file", "doc.pdf", "application/pdf", PDF_BYTES);
 
         when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
         when(userRepository.findById(2L)).thenReturn(Optional.of(agent));
@@ -120,7 +130,8 @@ class AttachmentServiceTest {
     @Test
     void uploadRejectsWhenTicketNotFound() {
         UserPrincipal caller = principalWithRoles(agent, "ROLE_AGENT");
-        MockMultipartFile file = new MockMultipartFile("file", "doc.pdf", "application/pdf", PDF_BYTES);
+        MockMultipartFile file =
+                new MockMultipartFile("file", "doc.pdf", "application/pdf", PDF_BYTES);
 
         when(ticketRepository.findById(10L)).thenReturn(Optional.empty());
 
@@ -132,7 +143,8 @@ class AttachmentServiceTest {
     @Test
     void uploadRejectsWhenAtMaxAttachmentLimit() {
         UserPrincipal caller = principalWithRoles(agent, "ROLE_AGENT");
-        MockMultipartFile file = new MockMultipartFile("file", "doc.pdf", "application/pdf", PDF_BYTES);
+        MockMultipartFile file =
+                new MockMultipartFile("file", "doc.pdf", "application/pdf", PDF_BYTES);
 
         when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
         when(userRepository.findById(2L)).thenReturn(Optional.of(agent));
@@ -146,7 +158,8 @@ class AttachmentServiceTest {
     @Test
     void uploadRejectsEmptyFile() {
         UserPrincipal caller = principalWithRoles(agent, "ROLE_AGENT");
-        MockMultipartFile file = new MockMultipartFile("file", "doc.pdf", "application/pdf", new byte[0]);
+        MockMultipartFile file =
+                new MockMultipartFile("file", "doc.pdf", "application/pdf", new byte[0]);
 
         when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
         when(userRepository.findById(2L)).thenReturn(Optional.of(agent));
@@ -161,7 +174,8 @@ class AttachmentServiceTest {
     void uploadRejectsFileOverSizeLimit() {
         UserPrincipal caller = principalWithRoles(agent, "ROLE_AGENT");
         byte[] tooBig = new byte[11 * 1024 * 1024];
-        MockMultipartFile file = new MockMultipartFile("file", "doc.pdf", "application/pdf", tooBig);
+        MockMultipartFile file =
+                new MockMultipartFile("file", "doc.pdf", "application/pdf", tooBig);
 
         when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
         when(userRepository.findById(2L)).thenReturn(Optional.of(agent));
@@ -175,7 +189,8 @@ class AttachmentServiceTest {
     @Test
     void uploadRejectsDisallowedExtension() {
         UserPrincipal caller = principalWithRoles(agent, "ROLE_AGENT");
-        MockMultipartFile file = new MockMultipartFile("file", "script.exe", "application/octet-stream", PDF_BYTES);
+        MockMultipartFile file =
+                new MockMultipartFile("file", "script.exe", "application/octet-stream", PDF_BYTES);
 
         when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
         when(userRepository.findById(2L)).thenReturn(Optional.of(agent));
@@ -190,7 +205,8 @@ class AttachmentServiceTest {
     void uploadRejectsContentThatDoesNotMatchExtension() {
         UserPrincipal caller = principalWithRoles(agent, "ROLE_AGENT");
         byte[] textBytes = "just plain text".getBytes();
-        MockMultipartFile file = new MockMultipartFile("file", "fake.pdf", "application/pdf", textBytes);
+        MockMultipartFile file =
+                new MockMultipartFile("file", "fake.pdf", "application/pdf", textBytes);
 
         when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
         when(userRepository.findById(2L)).thenReturn(Optional.of(agent));
@@ -203,7 +219,8 @@ class AttachmentServiceTest {
 
     @Test
     void listRejectsRequesterViewingSomeoneElsesTicket() {
-        User otherRequester = User.builder().id(99L).email("other@test.com").fullName("Other").build();
+        User otherRequester =
+                User.builder().id(99L).email("other@test.com").fullName("Other").build();
         UserPrincipal caller = principalWithRoles(otherRequester, "ROLE_REQUESTER");
 
         when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
@@ -216,18 +233,20 @@ class AttachmentServiceTest {
     @Test
     void listReturnsAttachmentsForOwningRequester() {
         UserPrincipal caller = principalWithRoles(requester, "ROLE_REQUESTER");
-        Attachment attachment = Attachment.builder()
-                .id(5L)
-                .ticket(ticket)
-                .filename("a.pdf")
-                .contentType("application/pdf")
-                .sizeBytes(100)
-                .storageKey("key")
-                .uploadedBy(requester)
-                .build();
+        Attachment attachment =
+                Attachment.builder()
+                        .id(5L)
+                        .ticket(ticket)
+                        .filename("a.pdf")
+                        .contentType("application/pdf")
+                        .sizeBytes(100)
+                        .storageKey("key")
+                        .uploadedBy(requester)
+                        .build();
 
         when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
-        when(attachmentRepository.findByTicketIdAndDeletedFalse(10L)).thenReturn(List.of(attachment));
+        when(attachmentRepository.findByTicketIdAndDeletedFalse(10L))
+                .thenReturn(List.of(attachment));
 
         List<AttachmentResponse> result = attachmentService.listAttachments(10L, caller);
 
@@ -237,16 +256,18 @@ class AttachmentServiceTest {
 
     @Test
     void downloadRejectsRequesterAccessingSomeoneElsesTicketAttachment() {
-        User otherRequester = User.builder().id(99L).email("other@test.com").fullName("Other").build();
+        User otherRequester =
+                User.builder().id(99L).email("other@test.com").fullName("Other").build();
         UserPrincipal caller = principalWithRoles(otherRequester, "ROLE_REQUESTER");
-        Attachment attachment = Attachment.builder()
-                .id(5L)
-                .ticket(ticket)
-                .filename("a.pdf")
-                .contentType("application/pdf")
-                .storageKey("key")
-                .uploadedBy(requester)
-                .build();
+        Attachment attachment =
+                Attachment.builder()
+                        .id(5L)
+                        .ticket(ticket)
+                        .filename("a.pdf")
+                        .contentType("application/pdf")
+                        .storageKey("key")
+                        .uploadedBy(requester)
+                        .build();
 
         when(attachmentRepository.findById(5L)).thenReturn(Optional.of(attachment));
 
@@ -260,14 +281,15 @@ class AttachmentServiceTest {
     @Test
     void downloadSucceedsAndReturnsContent() {
         UserPrincipal caller = principalWithRoles(requester, "ROLE_REQUESTER");
-        Attachment attachment = Attachment.builder()
-                .id(5L)
-                .ticket(ticket)
-                .filename("a.pdf")
-                .contentType("application/pdf")
-                .storageKey("key")
-                .uploadedBy(requester)
-                .build();
+        Attachment attachment =
+                Attachment.builder()
+                        .id(5L)
+                        .ticket(ticket)
+                        .filename("a.pdf")
+                        .contentType("application/pdf")
+                        .storageKey("key")
+                        .uploadedBy(requester)
+                        .build();
 
         when(attachmentRepository.findById(5L)).thenReturn(Optional.of(attachment));
         when(storageService.download("key")).thenReturn(PDF_BYTES);

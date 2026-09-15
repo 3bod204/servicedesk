@@ -3,7 +3,6 @@ package com.tcc.servicedesk.auth;
 import com.tcc.servicedesk.auth.dto.LoginRequest;
 import com.tcc.servicedesk.auth.dto.LoginResponce;
 import com.tcc.servicedesk.auth.dto.RefreshRequest;
-
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,10 +28,9 @@ public class AuthController {
     public LoginResponce refresh(@Valid @RequestBody RefreshRequest request) {
         return authService.refresh(request);
     }
-    
+
     @PostMapping("/logout")
     public void logout(@Valid @RequestBody RefreshRequest request) {
         authService.logout(request);
     }
-    
 }

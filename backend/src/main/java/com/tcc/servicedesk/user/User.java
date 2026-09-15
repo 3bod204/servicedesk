@@ -1,11 +1,6 @@
 package com.tcc.servicedesk.user;
 
-import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
-
 import com.tcc.servicedesk.ticket.Queue;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -17,31 +12,34 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity 
+@Entity
 @Table(name = "users")
-@Data 
-@AllArgsConstructor 
-@NoArgsConstructor(access = AccessLevel.PROTECTED) 
-@Builder 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 public class User {
-    
-    @Id 
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "email" , nullable = false, unique = true)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @Column(name = "full_name" , nullable = false)
+    @Column(name = "full_name", nullable = false)
     private String fullName;
 
     @Column(name = "avatar_url")
@@ -51,35 +49,33 @@ public class User {
     @Builder.Default
     private boolean active = true;
 
-    @Column(name = "deleted" , nullable = false)
+    @Column(name = "deleted", nullable = false)
     @Builder.Default
     private boolean deleted = false;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-    @Column(name = "updated_at" , nullable = false)
+    @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    @Version 
-    @Column(name = "version" , nullable = false)
+    @Version
+    @Column(name = "version", nullable = false)
     private Long version;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-        name = "user_roles",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-    name = "queue_members",
-    joinColumns = @JoinColumn(name = "user_id"),
-    inverseJoinColumns = @JoinColumn(name = "queue_id")
-)
-@Builder.Default
-private Set<Queue> queues = new HashSet<>();
+            name = "queue_members",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "queue_id"))
+    @Builder.Default
+    private Set<Queue> queues = new HashSet<>();
 }

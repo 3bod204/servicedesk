@@ -4,16 +4,15 @@ import com.tcc.servicedesk.user.dto.ChangePasswordRequest;
 import com.tcc.servicedesk.user.dto.CreateUserRequest;
 import com.tcc.servicedesk.user.dto.UpdateProfileRequest;
 import com.tcc.servicedesk.user.dto.UserResponse;
+import java.time.Instant;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.time.Instant;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -26,8 +25,7 @@ public class UserService {
     public UserService(
             UserRepository userRepository,
             RoleRepository roleRepository,
-            PasswordEncoder passwordEncoder
-    ) {
+            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -62,19 +60,25 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
         }
 
-        User user = User.builder()
-                .email(request.email())
-                .fullName(request.fullName())
-                .passwordHash(passwordEncoder.encode(request.password()))
-                .active(true)
-                .createdAt(Instant.now())
-                .updatedAt(Instant.now())
-                .build();
+        User user =
+                User.builder()
+                        .email(request.email())
+                        .fullName(request.fullName())
+                        .passwordHash(passwordEncoder.encode(request.password()))
+                        .active(true)
+                        .createdAt(Instant.now())
+                        .updatedAt(Instant.now())
+                        .build();
 
         for (String roleName : request.roleNames()) {
-            Role role = roleRepository.findByName(roleName)
-                    .orElseThrow(() -> new ResponseStatusException(
-                            HttpStatus.BAD_REQUEST, "Unknown role: " + roleName));
+            Role role =
+                    roleRepository
+                            .findByName(roleName)
+                            .orElseThrow(
+                                    () ->
+                                            new ResponseStatusException(
+                                                    HttpStatus.BAD_REQUEST,
+                                                    "Unknown role: " + roleName));
             user.getRoles().add(role);
         }
 
@@ -97,15 +101,15 @@ public class UserService {
     }
 
     private User findUserOrThrow(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "User not found"));
+        return userRepository
+                .findById(userId)
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
     private UserResponse toResponse(User user) {
-        Set<String> roleNames = user.getRoles().stream()
-                .map(Role::getName)
-                .collect(Collectors.toSet());
+        Set<String> roleNames =
+                user.getRoles().stream().map(Role::getName).collect(Collectors.toSet());
 
         return new UserResponse(
                 user.getId(),
@@ -113,7 +117,6 @@ public class UserService {
                 user.getFullName(),
                 user.getAvatarUrl(),
                 user.isActive(),
-                roleNames
-        );
+                roleNames);
     }
 }

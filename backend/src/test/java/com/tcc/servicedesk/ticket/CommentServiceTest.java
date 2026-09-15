@@ -39,8 +39,9 @@ class CommentServiceTest {
 
     @BeforeEach
     void setUp() {
-        commentService = new CommentService(
-                commentRepository, ticketRepository, userRepository, auditEntryRepository);
+        commentService =
+                new CommentService(
+                        commentRepository, ticketRepository, userRepository, auditEntryRepository);
 
         requester = User.builder().id(1L).email("req@test.com").fullName("Req Ester").build();
         agent = User.builder().id(2L).email("agent@test.com").fullName("Agent Smith").build();
@@ -48,9 +49,10 @@ class CommentServiceTest {
     }
 
     private UserPrincipal principalWithRoles(User user, String... roleNames) {
-        user.setRoles(Arrays.stream(roleNames)
-                .map(name -> Role.builder().id(1L).name(name).build())
-                .collect(Collectors.toSet()));
+        user.setRoles(
+                Arrays.stream(roleNames)
+                        .map(name -> Role.builder().id(1L).name(name).build())
+                        .collect(Collectors.toSet()));
         return new UserPrincipal(user);
     }
 
@@ -87,7 +89,8 @@ class CommentServiceTest {
 
     @Test
     void requesterCannotCommentOnSomeoneElsesTicket() {
-        User otherRequester = User.builder().id(99L).email("other@test.com").fullName("Other").build();
+        User otherRequester =
+                User.builder().id(99L).email("other@test.com").fullName("Other").build();
         UserPrincipal caller = principalWithRoles(otherRequester, "ROLE_REQUESTER");
         CreateCommentRequest request = new CreateCommentRequest("hello", false, null);
 
@@ -116,7 +119,8 @@ class CommentServiceTest {
     void createCommentRejectsParentFromDifferentTicket() {
         UserPrincipal caller = principalWithRoles(agent, "ROLE_AGENT");
         Ticket otherTicket = Ticket.builder().id(20L).requester(requester).build();
-        Comment parent = Comment.builder().id(3L).ticket(otherTicket).author(agent).body("p").build();
+        Comment parent =
+                Comment.builder().id(3L).ticket(otherTicket).author(agent).body("p").build();
         CreateCommentRequest request = new CreateCommentRequest("reply", false, 3L);
 
         when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));
@@ -171,7 +175,8 @@ class CommentServiceTest {
 
     @Test
     void listCommentsRejectsRequesterViewingSomeoneElsesTicket() {
-        User otherRequester = User.builder().id(99L).email("other@test.com").fullName("Other").build();
+        User otherRequester =
+                User.builder().id(99L).email("other@test.com").fullName("Other").build();
         UserPrincipal caller = principalWithRoles(otherRequester, "ROLE_REQUESTER");
 
         when(ticketRepository.findById(10L)).thenReturn(Optional.of(ticket));

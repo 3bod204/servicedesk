@@ -12,18 +12,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity 
+@Entity
 @Table(name = "roles")
-@Data 
-@AllArgsConstructor 
-@NoArgsConstructor(access = AccessLevel.PROTECTED) 
-@Builder 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 public class Role {
 
-    @Id 
-    @GeneratedValue(strategy = GenerationType.IDENTITY) 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name" , nullable = false ,unique = true)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 }

@@ -1,16 +1,13 @@
 package com.tcc.servicedesk.security;
 
 import com.tcc.servicedesk.user.User;
-
+import java.util.List;
 import lombok.Data;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.List;
-
-@Data 
+@Data
 public class UserPrincipal implements UserDetails {
 
     private final Long id;
@@ -26,12 +23,11 @@ public class UserPrincipal implements UserDetails {
         this.passwordHash = user.getPasswordHash();
         this.fullName = user.getFullName();
         this.active = user.isActive();
-        this.authorities = user.getRoles().stream()
-                .map(role -> (GrantedAuthority) new SimpleGrantedAuthority(role.getName()))
-                .toList();
+        this.authorities =
+                user.getRoles().stream()
+                        .map(role -> (GrantedAuthority) new SimpleGrantedAuthority(role.getName()))
+                        .toList();
     }
-
-   
 
     @Override
     public String getUsername() {

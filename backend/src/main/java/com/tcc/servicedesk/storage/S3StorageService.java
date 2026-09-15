@@ -22,19 +22,14 @@ public class S3StorageService implements StorageService {
     @Override
     public void upload(String key, byte[] content, String contentType) {
         s3Client.putObject(
-                PutObjectRequest.builder()
-                        .bucket(bucket)
-                        .key(key)
-                        .contentType(contentType)
-                        .build(),
+                PutObjectRequest.builder().bucket(bucket).key(key).contentType(contentType).build(),
                 RequestBody.fromBytes(content));
     }
 
     @Override
     public byte[] download(String key) {
-        return s3Client.getObjectAsBytes(
-                GetObjectRequest.builder().bucket(bucket).key(key).build()
-        ).asByteArray();
+        return s3Client.getObjectAsBytes(GetObjectRequest.builder().bucket(bucket).key(key).build())
+                .asByteArray();
     }
 
     @Override

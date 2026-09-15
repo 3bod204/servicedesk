@@ -2,13 +2,12 @@ package com.tcc.servicedesk.ticket;
 
 import com.tcc.servicedesk.user.User;
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.Instant;
+import lombok.*;
 
 @Entity
 @Table(name = "comments")
-@Data 
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

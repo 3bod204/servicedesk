@@ -10,5 +10,4 @@ public record AttachmentResponse(
         long sizeBytes,
         Long uploadedById,
         String uploadedByName,
-        Instant uploadedAt
-) {}
+        Instant uploadedAt) {}

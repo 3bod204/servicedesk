@@ -10,5 +10,4 @@ public record CommentResponse(
         String authorName,
         String body,
         boolean internal,
-        Instant createdAt
-) {}
+        Instant createdAt) {}

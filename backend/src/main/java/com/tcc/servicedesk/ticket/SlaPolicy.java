@@ -5,7 +5,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "sla_policies")
-@Data 
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

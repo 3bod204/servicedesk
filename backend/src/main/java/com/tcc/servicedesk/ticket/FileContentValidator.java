@@ -38,7 +38,8 @@ public class FileContentValidator {
         int sampleSize = Math.min(content.length, 8000);
         for (int i = 0; i < sampleSize; i++) {
             int b = content[i] & 0xFF;
-            boolean printableAscii = (b >= 0x20 && b <= 0x7E) || b == 0x09 || b == 0x0A || b == 0x0D;
+            boolean printableAscii =
+                    (b >= 0x20 && b <= 0x7E) || b == 0x09 || b == 0x0A || b == 0x0D;
             boolean utf8Continuation = b >= 0x80;
             if (!printableAscii && !utf8Continuation) {
                 return false;

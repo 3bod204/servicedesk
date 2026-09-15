@@ -25,16 +25,14 @@ public class UserController {
     @PutMapping("/me")
     public UserResponse updateProfile(
             @AuthenticationPrincipal UserPrincipal principal,
-            @Valid @RequestBody UpdateProfileRequest request
-    ) {
+            @Valid @RequestBody UpdateProfileRequest request) {
         return userService.updateProfile(principal.getId(), request);
     }
 
     @PutMapping("/me/password")
     public void changePassword(
             @AuthenticationPrincipal UserPrincipal principal,
-            @Valid @RequestBody ChangePasswordRequest request
-    ) {
+            @Valid @RequestBody ChangePasswordRequest request) {
         userService.changePassword(principal.getId(), request);
     }
 

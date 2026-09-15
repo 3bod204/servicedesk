@@ -1,17 +1,15 @@
 package com.tcc.servicedesk.ticket;
 
-import org.springframework.data.jpa.domain.Specification;
 import java.time.Instant;
 import java.util.List;
+import org.springframework.data.jpa.domain.Specification;
 
 public final class TicketSpecifications {
 
-    private TicketSpecifications() {
-    }
+    private TicketSpecifications() {}
 
     public static Specification<Ticket> hasStatus(TicketStatus status) {
-        return (root, query, cb) ->
-                status == null ? null : cb.equal(root.get("status"), status);
+        return (root, query, cb) -> status == null ? null : cb.equal(root.get("status"), status);
     }
 
     public static Specification<Ticket> hasPriority(Priority priority) {
@@ -54,8 +52,7 @@ public final class TicketSpecifications {
             String pattern = "%" + text.toLowerCase() + "%";
             return cb.or(
                     cb.like(cb.lower(root.get("title")), pattern),
-                    cb.like(cb.lower(root.get("description")), pattern)
-            );
+                    cb.like(cb.lower(root.get("description")), pattern));
         };
     }
 
@@ -64,9 +61,9 @@ public final class TicketSpecifications {
     }
 
     public static Specification<Ticket> hasQueueIn(List<Long> queueIds) {
-    return (root, query, cb) ->
-            (queueIds == null || queueIds.isEmpty())
-                ? cb.disjunction()
-                : root.get("queue").get("id").in(queueIds);
-}
+        return (root, query, cb) ->
+                (queueIds == null || queueIds.isEmpty())
+                        ? cb.disjunction()
+                        : root.get("queue").get("id").in(queueIds);
+    }
 }
