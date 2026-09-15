@@ -73,3 +73,18 @@ jobs:
         with:
           name: dependency-check-report
           path: backend/target/dependency-check-report.html
+
+  image-build:
+    needs: security-scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: |
+          docker build -t servicedesk-backend:${{ github.sha }} backend/
+      - name: Save image as artifact
+        run: docker save servicedesk-backend:${{ github.sha }} -o backend-image.tar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backend-image
+          path: backend-image.tar
