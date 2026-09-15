@@ -24,23 +24,7 @@
     <shedlock.version>5.16.0</shedlock.version>
     <testcontainers.version>1.21.4</testcontainers.version>
     <lombok.version>1.18.46</lombok.version>
-    <!-- Overrides Spring Boot 3.3.4's managed 2.17.2, which has known jackson-databind CVEs -->
-    <jackson-bom.version>2.19.0</jackson-bom.version>
   </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <!-- Overrides the vulnerable netty-nio-client transitives pulled in by
-           software.amazon.awssdk:s3 with the current patched netty release. -->
-      <dependency>
-        <groupId>io.netty</groupId>
-        <artifactId>netty-bom</artifactId>
-        <version>4.1.121.Final</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -121,6 +105,14 @@
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>s3</artifactId>
       <version>2.20.68</version>
+      <!-- We only use the sync S3Client (apache-client), never S3AsyncClient,
+           so drop the netty-nio-client transitive rather than patch its CVEs. -->
+      <exclusions>
+        <exclusion>
+          <groupId>software.amazon.awssdk</groupId>
+          <artifactId>netty-nio-client</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
