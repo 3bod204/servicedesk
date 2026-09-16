@@ -1,11 +1,15 @@
 package com.tcc.servicedesk.ticket;
 
 import com.tcc.servicedesk.security.UserPrincipal;
+import com.tcc.servicedesk.ticket.dto.AuditEntryResponse;
 import com.tcc.servicedesk.ticket.dto.CreateTicketRequest;
 import com.tcc.servicedesk.ticket.dto.TicketResponse;
 import com.tcc.servicedesk.ticket.dto.TicketSearchCriteria;
 import com.tcc.servicedesk.ticket.dto.UpdateStatusRequest;
 import jakarta.validation.Valid;
+
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -45,4 +49,9 @@ public class TicketController {
             Pageable pageable) {
         return ticketService.searchTickets(principal, criteria, pageable);
     }
+
+    @GetMapping("/{id}/audit")
+    public List<AuditEntryResponse> getAuditHistory(@PathVariable Long id) {
+    return ticketService.getAuditHistory(id);
+}
 }

@@ -3,6 +3,7 @@ package com.tcc.servicedesk.ticket;
 import com.tcc.servicedesk.notification.NotificationService;
 import com.tcc.servicedesk.security.UserPrincipal;
 import com.tcc.servicedesk.ticket.dto.AssignTicketRequest;
+import com.tcc.servicedesk.ticket.dto.AuditEntryResponse;
 import com.tcc.servicedesk.ticket.dto.CreateTicketRequest;
 import com.tcc.servicedesk.ticket.dto.TicketResponse;
 import com.tcc.servicedesk.ticket.dto.TicketSearchCriteria;
@@ -304,6 +305,28 @@ public class TicketService {
 
         return ticketRepository.findAll(spec, pageable).map(this::toResponse);
     }
+
+    public List<AuditEntryResponse> getAuditHistory(Long ticketId) {
+         ticketRepository.findById(ticketId)
+            .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Ticket not found"));
+
+        return auditEntryRepository.findByTicketIdOrderByCreatedAtDesc(ticketId).stream()
+            .map(this::toAuditResponse)
+            .toList();
+}
+
+private AuditEntryResponse toAuditResponse(AuditEntry entry) {
+    return new AuditEntryResponse(
+            entry.getId(),
+            entry.getField(),
+            entry.getOldValue(),
+            entry.getNewValue(),
+            entry.getActor().getId(),
+            entry.getActor().getFullName(),
+            entry.getCreatedAt()
+    );
+}
 
     private TicketResponse toResponse(Ticket ticket) {
         return new TicketResponse(
