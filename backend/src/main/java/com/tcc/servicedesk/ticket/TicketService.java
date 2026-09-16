@@ -307,26 +307,28 @@ public class TicketService {
     }
 
     public List<AuditEntryResponse> getAuditHistory(Long ticketId) {
-         ticketRepository.findById(ticketId)
-            .orElseThrow(() -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Ticket not found"));
+        ticketRepository
+                .findById(ticketId)
+                .orElseThrow(
+                        () ->
+                                new ResponseStatusException(
+                                        HttpStatus.NOT_FOUND, "Ticket not found"));
 
         return auditEntryRepository.findByTicketIdOrderByCreatedAtDesc(ticketId).stream()
-            .map(this::toAuditResponse)
-            .toList();
-}
+                .map(this::toAuditResponse)
+                .toList();
+    }
 
-private AuditEntryResponse toAuditResponse(AuditEntry entry) {
-    return new AuditEntryResponse(
-            entry.getId(),
-            entry.getField(),
-            entry.getOldValue(),
-            entry.getNewValue(),
-            entry.getActor().getId(),
-            entry.getActor().getFullName(),
-            entry.getCreatedAt()
-    );
-}
+    private AuditEntryResponse toAuditResponse(AuditEntry entry) {
+        return new AuditEntryResponse(
+                entry.getId(),
+                entry.getField(),
+                entry.getOldValue(),
+                entry.getNewValue(),
+                entry.getActor().getId(),
+                entry.getActor().getFullName(),
+                entry.getCreatedAt());
+    }
 
     private TicketResponse toResponse(Ticket ticket) {
         return new TicketResponse(

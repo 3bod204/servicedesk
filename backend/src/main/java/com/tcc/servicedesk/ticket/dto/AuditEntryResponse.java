@@ -9,5 +9,4 @@ public record AuditEntryResponse(
         String newValue,
         Long actorId,
         String actorName,
-        Instant createdAt
-) {}
+        Instant createdAt) {}

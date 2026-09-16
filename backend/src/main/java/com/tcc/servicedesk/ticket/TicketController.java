@@ -7,9 +7,7 @@ import com.tcc.servicedesk.ticket.dto.TicketResponse;
 import com.tcc.servicedesk.ticket.dto.TicketSearchCriteria;
 import com.tcc.servicedesk.ticket.dto.UpdateStatusRequest;
 import jakarta.validation.Valid;
-
 import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -52,6 +50,6 @@ public class TicketController {
 
     @GetMapping("/{id}/audit")
     public List<AuditEntryResponse> getAuditHistory(@PathVariable Long id) {
-    return ticketService.getAuditHistory(id);
-}
+        return ticketService.getAuditHistory(id);
+    }
 }
