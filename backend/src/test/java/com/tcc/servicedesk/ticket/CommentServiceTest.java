@@ -6,6 +6,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.tcc.servicedesk.notification.NotificationService;
 import com.tcc.servicedesk.security.UserPrincipal;
 import com.tcc.servicedesk.ticket.dto.CommentResponse;
 import com.tcc.servicedesk.ticket.dto.CreateCommentRequest;
@@ -30,6 +31,7 @@ class CommentServiceTest {
     @Mock private TicketRepository ticketRepository;
     @Mock private UserRepository userRepository;
     @Mock private AuditEntryRepository auditEntryRepository;
+    @Mock private NotificationService notificationService;
 
     private CommentService commentService;
 
@@ -41,7 +43,11 @@ class CommentServiceTest {
     void setUp() {
         commentService =
                 new CommentService(
-                        commentRepository, ticketRepository, userRepository, auditEntryRepository);
+                        commentRepository,
+                        ticketRepository,
+                        userRepository,
+                        auditEntryRepository,
+                        notificationService);
 
         requester = User.builder().id(1L).email("req@test.com").fullName("Req Ester").build();
         agent = User.builder().id(2L).email("agent@test.com").fullName("Agent Smith").build();

@@ -36,3 +36,6 @@ app:
     access-key: ${STORAGE_ACCESS_KEY}
     secret-key: ${STORAGE_SECRET_KEY}
     region: ${STORAGE_REGION:us-east-1}
+
+shedlock:
+  defaults-lock-at-most-for: 10m

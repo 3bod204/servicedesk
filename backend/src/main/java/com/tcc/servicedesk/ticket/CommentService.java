@@ -1,5 +1,6 @@
 package com.tcc.servicedesk.ticket;
 
+import com.tcc.servicedesk.notification.NotificationService;
 import com.tcc.servicedesk.security.UserPrincipal;
 import com.tcc.servicedesk.ticket.dto.CommentResponse;
 import com.tcc.servicedesk.ticket.dto.CreateCommentRequest;
@@ -19,16 +20,19 @@ public class CommentService {
     private final TicketRepository ticketRepository;
     private final UserRepository userRepository;
     private final AuditEntryRepository auditEntryRepository;
+    private final NotificationService notificationService;
 
     public CommentService(
             CommentRepository commentRepository,
             TicketRepository ticketRepository,
             UserRepository userRepository,
-            AuditEntryRepository auditEntryRepository) {
+            AuditEntryRepository auditEntryRepository,
+            NotificationService notificationService) {
         this.commentRepository = commentRepository;
         this.ticketRepository = ticketRepository;
         this.userRepository = userRepository;
         this.auditEntryRepository = auditEntryRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -90,6 +94,9 @@ public class CommentService {
                         .build();
 
         commentRepository.save(comment);
+        if (!comment.isInternal()) {
+            notificationService.notifyCommentAdded(ticket, author.getFullName());
+        }
 
         auditEntryRepository.save(
                 AuditEntry.builder()

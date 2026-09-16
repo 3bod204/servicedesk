@@ -1,5 +1,6 @@
 package com.tcc.servicedesk.ticket;
 
+import com.tcc.servicedesk.notification.NotificationService;
 import com.tcc.servicedesk.security.UserPrincipal;
 import com.tcc.servicedesk.ticket.dto.AssignTicketRequest;
 import com.tcc.servicedesk.ticket.dto.CreateTicketRequest;
@@ -28,6 +29,7 @@ public class TicketService {
     private final TicketReferenceGenerator referenceGenerator;
     private final SlaPolicyRepository slaPolicyRepository;
     private final AuditEntryRepository auditEntryRepository;
+    private final NotificationService notificationService;
 
     public TicketService(
             TicketRepository ticketRepository,
@@ -35,13 +37,15 @@ public class TicketService {
             UserRepository userRepository,
             TicketReferenceGenerator referenceGenerator,
             SlaPolicyRepository slaPolicyRepository,
-            AuditEntryRepository auditEntryRepository) {
+            AuditEntryRepository auditEntryRepository,
+            NotificationService notificationService) {
         this.ticketRepository = ticketRepository;
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
         this.referenceGenerator = referenceGenerator;
         this.slaPolicyRepository = slaPolicyRepository;
         this.auditEntryRepository = auditEntryRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -93,6 +97,8 @@ public class TicketService {
                         .build();
 
         ticketRepository.save(ticket);
+
+        notificationService.notifyTicketCreated(ticket);
 
         return toResponse(ticket);
     }
@@ -158,6 +164,7 @@ public class TicketService {
 
         if (newStatus == TicketStatus.RESOLVED) {
             ticket.setResolvedAt(now);
+            notificationService.notifyTicketResolved(ticket);
         }
 
         if (newStatus == TicketStatus.CLOSED) {
@@ -248,6 +255,7 @@ public class TicketService {
                             .build());
         }
 
+        notificationService.notifyTicketAssigned(ticket);
         return toResponse(ticket);
     }
 
