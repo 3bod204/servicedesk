@@ -11,4 +11,21 @@ public interface TicketRepository
     Optional<Ticket> findByReference(String reference);
 
     List<Ticket> findAllBySlaDueAtIsNotNullAndResolvedAtIsNullAndDeletedFalse();
+
+    long countByStatusAndDeletedFalse(TicketStatus status);
+
+    long countByPriorityAndDeletedFalse(Priority priority);
+
+    List<Ticket> findAllByDeletedFalseAndFirstResponseAtIsNotNull();
+
+    List<Ticket> findAllByDeletedFalseAndResolvedAtIsNotNull();
+
+    long countByDeletedFalseAndResolvedAtIsNotNull();
+
+    long countByDeletedFalseAndResolvedAtIsNotNullAndResolutionBreachedFalse();
+
+    List<Ticket> findAllByDeletedFalseAndAssigneeIsNotNullAndStatusNotIn(
+            List<TicketStatus> excludedStatuses);
+
+    List<Ticket> findAllByDeletedFalse();
 }

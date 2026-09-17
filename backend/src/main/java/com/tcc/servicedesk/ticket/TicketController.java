@@ -1,6 +1,7 @@
 package com.tcc.servicedesk.ticket;
 
 import com.tcc.servicedesk.security.UserPrincipal;
+import com.tcc.servicedesk.ticket.dto.AssignTicketRequest;
 import com.tcc.servicedesk.ticket.dto.AuditEntryResponse;
 import com.tcc.servicedesk.ticket.dto.CreateTicketRequest;
 import com.tcc.servicedesk.ticket.dto.TicketResponse;
@@ -51,5 +52,13 @@ public class TicketController {
     @GetMapping("/{id}/audit")
     public List<AuditEntryResponse> getAuditHistory(@PathVariable Long id) {
         return ticketService.getAuditHistory(id);
+    }
+
+    @PutMapping("/{id}/assign")
+    public TicketResponse assignTicket(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable Long id,
+            @Valid @RequestBody AssignTicketRequest request) {
+        return ticketService.assignTicket(id, principal.getId(), request);
     }
 }
