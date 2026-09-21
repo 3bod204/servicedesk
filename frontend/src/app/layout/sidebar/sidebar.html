@@ -1,0 +1,61 @@
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 12h6M9 8h6M9 16h4M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z"></path>
+      </svg>
+    </div>
+    <div class="logo-wordmark">
+      <div class="logo-name">ServiceDesk</div>
+      <div class="logo-tag">TCC · IT Support</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section">My Workspace</div>
+
+    <a class="nav-item" routerLink="/tickets" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 12h6M9 8h6M9 16h4M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z"></path>
+      </svg>
+      All Tickets
+    </a>
+
+    <a class="nav-item" routerLink="/tickets/new">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle><path d="M12 8v8M8 12h8"></path>
+      </svg>
+      New Ticket
+    </a>
+
+    @if (isManagerOrAdmin) {
+      <div class="nav-section">Reports</div>
+      <a class="nav-item" routerLink="/dashboard" routerLinkActive="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="12" width="5" height="9" rx="1"></rect><rect x="9.5" y="7" width="5" height="14" rx="1"></rect><rect x="16" y="3" width="5" height="18" rx="1"></rect>
+        </svg>
+        Dashboard
+      </a>
+    }
+
+    @if (isAdmin) {
+      <div class="nav-section">Administration</div>
+      <a class="nav-item" routerLink="/admin/users" routerLinkActive="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path><circle cx="9" cy="7" r="4"></circle>
+        </svg>
+        Users
+      </a>
+    }
+  </nav>
+
+  <div class="sidebar-footer">
+    <a class="user-card" routerLink="/profile">
+      <div class="av av-md av-blue">{{ initials }}</div>
+      <div class="user-info">
+        <div class="user-name">{{ authService.currentUser()?.fullName }}</div>
+        <div class="user-role">{{ roleLabel }}</div>
+      </div>
+    </a>
+  </div>
+</aside>

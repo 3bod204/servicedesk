@@ -1,0 +1,83 @@
+<div class="page-hdr">
+  <div>
+    <div class="page-title">Tickets</div>
+    <div class="page-sub">{{ totalElements() }} tickets</div>
+  </div>
+  <button class="btn btn-primary" (click)="createTicket()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+    New Ticket
+  </button>
+</div>
+
+<div class="filter-bar">
+  <div class="tab-group">
+    <button class="tab" [class.active]="activeTab() === 'all'" (click)="setTab('all')">All</button>
+    <button class="tab" [class.active]="activeTab() === 'open'" (click)="setTab('open')">Open</button>
+    <button class="tab" [class.active]="activeTab() === 'mine'" (click)="setTab('mine')">Mine</button>
+    <button class="tab" [class.active]="activeTab() === 'resolved'" (click)="setTab('resolved')">Resolved</button>
+  </div>
+  <select class="flt-sel">
+    <option>All Priorities</option>
+    <option>Urgent</option>
+    <option>High</option>
+    <option>Medium</option>
+    <option>Low</option>
+  </select>
+  <span class="spacer"></span>
+</div>
+
+@if (loading()) {
+  <div class="tbl-wrap"><div style="padding: 40px; text-align: center; color: var(--text-muted);">Loading tickets…</div></div>
+} @else if (errorMessage()) {
+  <div class="tbl-wrap"><div style="padding: 40px; text-align: center; color: var(--status-reopened);">{{ errorMessage() }}</div></div>
+} @else if (filteredTickets().length === 0) {
+  <div class="tbl-wrap"><div style="padding: 40px; text-align: center; color: var(--text-muted);">No tickets found.</div></div>
+} @else {
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Ticket</th><th>Subject</th><th>Status</th><th>Priority</th><th>Assignee</th><th>Queue</th><th style="text-align:right">SLA</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (ticket of filteredTickets(); track ticket.id) {
+          <tr (click)="openTicket(ticket.id)">
+            <td><div class="tkt-ref">{{ ticket.reference }}</div></td>
+            <td>
+              <div class="tkt-title">{{ ticket.title }}</div>
+              <div class="tkt-meta">{{ ticket.categoryName }} · {{ ticket.requesterName }}</div>
+            </td>
+            <td><span class="badge" [ngClass]="statusClass(ticket.status)">{{ statusLabel(ticket.status) }}</span></td>
+            <td>
+              <span class="prio" [ngClass]="priorityClass(ticket.priority)">
+                <span class="prio-dot" [ngClass]="priorityClass(ticket.priority)"></span>
+                {{ ticket.priority | titlecase }}
+              </span>
+            </td>
+            <td>
+              @if (ticket.assigneeName) {
+                <span style="font-size:12.5px;color:var(--text-primary);">{{ ticket.assigneeName }}</span>
+              } @else {
+                <span style="font-size:12px;color:var(--text-muted);">Unassigned</span>
+              }
+            </td>
+            <td><span style="font-size:12.5px;color:var(--text-secondary);">{{ ticket.queueName }}</span></td>
+            <td style="text-align:right">
+              <span class="sla-chip" [ngClass]="slaInfo(ticket).cssClass">{{ slaInfo(ticket).label }}</span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="paginav">
+      <div class="paginav-info">Showing {{ page() * pageSize + 1 }}–{{ page() * pageSize + filteredTickets().length }} of {{ totalElements() }}</div>
+      <div class="paginav-btns">
+        <button class="pg-btn" [disabled]="page() === 0" (click)="prevPage()">‹</button>
+        <button class="pg-btn active">{{ page() + 1 }}</button>
+        <button class="pg-btn" [disabled]="(page() + 1) * pageSize >= totalElements()" (click)="nextPage()">›</button>
+      </div>
+    </div>
+  </div>
+}
