@@ -17,6 +17,7 @@ export interface TicketResponse {
   status: TicketStatus;
   priority: Priority;
   categoryName: string;
+  queueId: number;
   queueName: string;
   requesterId: number;
   requesterName: string;
@@ -24,6 +25,8 @@ export interface TicketResponse {
   assigneeName: string | null;
   createdAt: string;
   slaDueAt: string;
+  resolvedAt: string | null;
+  closedAt: string | null;
 }
 
 export interface CreateTicketRequest {

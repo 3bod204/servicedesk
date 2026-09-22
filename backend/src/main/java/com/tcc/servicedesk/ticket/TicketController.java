@@ -12,6 +12,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,10 +56,17 @@ public class TicketController {
     }
 
     @PutMapping("/{id}/assign")
+    @PreAuthorize("hasAnyRole('AGENT','MANAGER','ADMIN')")
     public TicketResponse assignTicket(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable Long id,
             @Valid @RequestBody AssignTicketRequest request) {
         return ticketService.assignTicket(id, principal.getId(), request);
+    }
+
+    @GetMapping("/{id}")
+    public TicketResponse getTicket(
+            @AuthenticationPrincipal UserPrincipal principal, @PathVariable Long id) {
+        return ticketService.getById(id, principal);
     }
 }

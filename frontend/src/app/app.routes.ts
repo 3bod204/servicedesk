@@ -12,7 +12,8 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'tickets', pathMatch: 'full' },
       { path: 'tickets', data: { breadcrumb: 'All Tickets' }, loadComponent: () => import('./features/tickets/ticket-list/ticket-list').then(m => m.TicketList) },
+      { path: 'tickets/:id', data: { breadcrumb: 'Ticket Detail' }, loadComponent: () => import('./features/tickets/ticket-detail/ticket-detail').then(m => m.TicketDetail) },
     ]
   },
-  { path: '**', redirectTo: 'login' }
+  { path: '**', redirectTo: 'login' },
 ];

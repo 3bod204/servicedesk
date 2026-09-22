@@ -186,6 +186,48 @@ public class AttachmentService {
         return new DownloadedFile(content, attachment.getFilename(), attachment.getContentType());
     }
 
+    @Transactional
+    public void deleteAttachment(Long attachmentId, UserPrincipal caller) {
+        Attachment attachment =
+                attachmentRepository
+                        .findById(attachmentId)
+                        .orElseThrow(
+                                () ->
+                                        new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND, "Attachment not found"));
+
+        boolean isUploader = attachment.getUploadedBy().getId().equals(caller.getId());
+        boolean isAdmin =
+                caller.getAuthorities().stream()
+                        .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isUploader && !isAdmin) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Only the uploader or an admin can delete this attachment");
+        }
+
+        attachment.setDeleted(true);
+
+        User actor =
+                userRepository
+                        .findById(caller.getId())
+                        .orElseThrow(
+                                () ->
+                                        new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND, "User not found"));
+
+        auditEntryRepository.save(
+                AuditEntry.builder()
+                        .ticket(attachment.getTicket())
+                        .actor(actor)
+                        .field("attachment")
+                        .oldValue(attachment.getFilename())
+                        .newValue(null)
+                        .createdAt(Instant.now())
+                        .build());
+    }
+
     private void checkUploadPermission(Ticket ticket, UserPrincipal caller) {
         if (isRequesterOnly(caller) && !ticket.getRequester().getId().equals(caller.getId())) {
             throw new ResponseStatusException(

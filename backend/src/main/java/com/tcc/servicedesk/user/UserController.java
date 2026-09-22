@@ -3,6 +3,7 @@ package com.tcc.servicedesk.user;
 import com.tcc.servicedesk.security.UserPrincipal;
 import com.tcc.servicedesk.user.dto.*;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -52,5 +53,11 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public UserResponse activateUser(@PathVariable Long id) {
         return userService.activateUser(id);
+    }
+
+    @GetMapping("/by-queue/{queueId}")
+    @PreAuthorize("hasAnyRole('AGENT', 'MANAGER', 'ADMIN')")
+    public List<UserResponse> getUsersByQueue(@PathVariable Long queueId) {
+        return userService.getUsersByQueue(queueId);
     }
 }

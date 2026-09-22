@@ -9,13 +9,16 @@ public record TicketResponse(
         String reference,
         String title,
         String description,
-        TicketStatus ticketStatus,
+        TicketStatus status,
         Priority priority,
         String categoryName,
+        Long queueId,
         String queueName,
         Long requesterId,
         String requesterName,
         Long assigneeId,
         String assigneeName,
         Instant createdAt,
-        Instant slaDueAt) {}
+        Instant slaDueAt,
+        Instant resolvedAt,
+        Instant closedAt) {}

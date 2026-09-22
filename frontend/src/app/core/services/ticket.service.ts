@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Page, TicketResponse, TicketSearchCriteria } from '../../shared/models/ticket.model';
+import { AssignTicketRequest, Page, TicketResponse, TicketSearchCriteria, UpdateStatusRequest } from '../../shared/models/ticket.model';
+import { AuditEntryResponse } from '../../shared/models/audit.model';
 
 @Injectable({ providedIn: 'root' })
 export class TicketService {
@@ -22,5 +23,17 @@ export class TicketService {
 
   getById(id: number): Observable<TicketResponse> {
     return this.http.get<TicketResponse>(`${this.baseUrl}/${id}`);
+  }
+
+  getAudit(ticketId: number): Observable<AuditEntryResponse[]> {
+  return this.http.get<AuditEntryResponse[]>(`${this.baseUrl}/${ticketId}/audit`);
+  }
+
+  changeStatus(ticketId: number, request: UpdateStatusRequest): Observable<TicketResponse> {
+  return this.http.put<TicketResponse>(`${this.baseUrl}/${ticketId}/status`, request);
+  }
+
+  assign(ticketId: number, request: AssignTicketRequest): Observable<TicketResponse> {
+  return this.http.put<TicketResponse>(`${this.baseUrl}/${ticketId}/assign`, request);
   }
 }

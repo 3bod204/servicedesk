@@ -5,6 +5,7 @@ import com.tcc.servicedesk.user.dto.CreateUserRequest;
 import com.tcc.servicedesk.user.dto.UpdateProfileRequest;
 import com.tcc.servicedesk.user.dto.UserResponse;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
@@ -98,6 +99,12 @@ public class UserService {
         user.setActive(true);
         user.setUpdatedAt(Instant.now());
         return toResponse(user);
+    }
+
+    public List<UserResponse> getUsersByQueue(Long queueId) {
+        return userRepository.findByQueues_IdAndActiveTrueAndDeletedFalse(queueId).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     private User findUserOrThrow(Long userId) {

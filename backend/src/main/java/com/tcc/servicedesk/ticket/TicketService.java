@@ -104,6 +104,28 @@ public class TicketService {
         return toResponse(ticket);
     }
 
+    @Transactional(readOnly = true)
+    public TicketResponse getById(Long ticketId, UserPrincipal caller) {
+        Ticket ticket =
+                ticketRepository
+                        .findById(ticketId)
+                        .orElseThrow(
+                                () ->
+                                        new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND, "Ticket not found"));
+
+        boolean isRequesterOnly =
+                caller.getAuthorities().stream()
+                        .map(a -> a.getAuthority())
+                        .allMatch(role -> role.equals("ROLE_REQUESTER"));
+
+        if (isRequesterOnly && !ticket.getRequester().getId().equals(caller.getId())) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, "You may only view your own ticket");
+        }
+        return toResponse(ticket);
+    }
+
     @Transactional
     public TicketResponse changeStatus(
             Long ticketId, Long actingUserId, UpdateStatusRequest request) {
@@ -306,6 +328,7 @@ public class TicketService {
         return ticketRepository.findAll(spec, pageable).map(this::toResponse);
     }
 
+    @Transactional(readOnly = true)
     public List<AuditEntryResponse> getAuditHistory(Long ticketId) {
         ticketRepository
                 .findById(ticketId)
@@ -339,12 +362,15 @@ public class TicketService {
                 ticket.getStatus(),
                 ticket.getPriority(),
                 ticket.getCategory().getName(),
+                ticket.getQueue().getId(),
                 ticket.getQueue().getName(),
                 ticket.getRequester().getId(),
                 ticket.getRequester().getFullName(),
                 ticket.getAssignee() != null ? ticket.getAssignee().getId() : null,
                 ticket.getAssignee() != null ? ticket.getAssignee().getFullName() : null,
                 ticket.getCreatedAt(),
-                ticket.getSlaDueAt());
+                ticket.getSlaDueAt(),
+                ticket.getResolvedAt(),
+                ticket.getClosedAt());
     }
 }

@@ -35,6 +35,11 @@ public class AttachmentController {
         return attachmentService.listAttachments(ticketId, principal);
     }
 
+    @DeleteMapping("/attachments/{id}")
+    public void delete(@AuthenticationPrincipal UserPrincipal principal, @PathVariable Long id) {
+        attachmentService.deleteAttachment(id, principal);
+    }
+
     @GetMapping("/attachments/{id}/download")
     public ResponseEntity<byte[]> download(
             @AuthenticationPrincipal UserPrincipal principal, @PathVariable Long id) {

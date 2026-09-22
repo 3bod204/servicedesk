@@ -1,11 +1,13 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TicketService } from '../../../core/services/ticket.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { TicketResponse, TicketStatus } from '../../../shared/models/ticket.model';
+import { Priority, TicketResponse, TicketStatus } from '../../../shared/models/ticket.model';
 
 type TabFilter = 'all' | 'open' | 'mine' | 'resolved';
+type PriorityFilter = Priority | 'ALL';
 
 const STATUS_LABELS: Record<TicketStatus, string> = {
   NEW: 'New', ASSIGNED: 'Assigned', IN_PROGRESS: 'In Progress',
@@ -20,7 +22,7 @@ const STATUS_CLASS: Record<TicketStatus, string> = {
 @Component({
   selector: 'app-ticket-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './ticket-list.html',
   styleUrl: './ticket-list.scss'
 })
@@ -30,23 +32,28 @@ export class TicketList implements OnInit {
   page = signal(0);
   pageSize = 20;
   activeTab = signal<TabFilter>('all');
+  priorityFilter = signal<PriorityFilter>('ALL');
   loading = signal(true);
   errorMessage = signal<string | null>(null);
 
   filteredTickets = computed(() => {
     const tab = this.activeTab();
+    const priority = this.priorityFilter();
     const myId = this.authService.currentUser()?.id;
-    const all = this.tickets();
+    let all = this.tickets();
 
     if (tab === 'open') {
-      return all.filter(t => t.status !== 'RESOLVED' && t.status !== 'CLOSED');
+      all = all.filter(t => t.status !== 'RESOLVED' && t.status !== 'CLOSED');
+    } else if (tab === 'mine') {
+      all = all.filter(t => t.assigneeId === myId);
+    } else if (tab === 'resolved') {
+      all = all.filter(t => t.status === 'RESOLVED');
     }
-    if (tab === 'mine') {
-      return all.filter(t => t.assigneeId === myId);
+
+    if (priority !== 'ALL') {
+      all = all.filter(t => t.priority === priority);
     }
-    if (tab === 'resolved') {
-      return all.filter(t => t.status === 'RESOLVED');
-    }
+
     return all;
   });
 
