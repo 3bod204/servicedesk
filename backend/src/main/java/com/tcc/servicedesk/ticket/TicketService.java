@@ -4,7 +4,9 @@ import com.tcc.servicedesk.notification.NotificationService;
 import com.tcc.servicedesk.security.UserPrincipal;
 import com.tcc.servicedesk.ticket.dto.AssignTicketRequest;
 import com.tcc.servicedesk.ticket.dto.AuditEntryResponse;
+import com.tcc.servicedesk.ticket.dto.CategoryResponse;
 import com.tcc.servicedesk.ticket.dto.CreateTicketRequest;
+import com.tcc.servicedesk.ticket.dto.QueueResponse;
 import com.tcc.servicedesk.ticket.dto.TicketResponse;
 import com.tcc.servicedesk.ticket.dto.TicketSearchCriteria;
 import com.tcc.servicedesk.ticket.dto.UpdateStatusRequest;
@@ -26,6 +28,7 @@ public class TicketService {
 
     private final TicketRepository ticketRepository;
     private final CategoryRepository categoryRepository;
+    private final QueueRepository queueRepository;
     private final UserRepository userRepository;
     private final TicketReferenceGenerator referenceGenerator;
     private final SlaPolicyRepository slaPolicyRepository;
@@ -35,6 +38,7 @@ public class TicketService {
     public TicketService(
             TicketRepository ticketRepository,
             CategoryRepository categoryRepository,
+            QueueRepository queueRepository,
             UserRepository userRepository,
             TicketReferenceGenerator referenceGenerator,
             SlaPolicyRepository slaPolicyRepository,
@@ -42,6 +46,7 @@ public class TicketService {
             NotificationService notificationService) {
         this.ticketRepository = ticketRepository;
         this.categoryRepository = categoryRepository;
+        this.queueRepository = queueRepository;
         this.userRepository = userRepository;
         this.referenceGenerator = referenceGenerator;
         this.slaPolicyRepository = slaPolicyRepository;
@@ -339,6 +344,21 @@ public class TicketService {
 
         return auditEntryRepository.findByTicketIdOrderByCreatedAtDesc(ticketId).stream()
                 .map(this::toAuditResponse)
+                .toList();
+    }
+
+    @Transactional
+    public List<CategoryResponse> listCategories() {
+        return categoryRepository.findByActiveTrue().stream()
+                .map(c -> new CategoryResponse(c.getId(), c.getName(), c.getQueue().getName()))
+                .toList();
+    }
+
+    @Transactional
+    public List<QueueResponse> listQueues() {
+        return queueRepository.findAll().stream()
+                .filter(Queue::isActive)
+                .map(q -> new QueueResponse(q.getId(), q.getName()))
                 .toList();
     }
 

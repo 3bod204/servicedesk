@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ReportingService {
@@ -103,6 +104,7 @@ public class ReportingService {
         return new SlaComplianceMetric(resolvedTickets.size(), compliant, percentage);
     }
 
+    @Transactional(readOnly = true)
     public List<AgentWorkload> getAgentWorkload(ReportCriteria criteria) {
         List<TicketStatus> closedStatuses = List.of(TicketStatus.RESOLVED, TicketStatus.CLOSED);
 

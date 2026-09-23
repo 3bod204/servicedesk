@@ -3,7 +3,9 @@ package com.tcc.servicedesk.ticket;
 import com.tcc.servicedesk.security.UserPrincipal;
 import com.tcc.servicedesk.ticket.dto.AssignTicketRequest;
 import com.tcc.servicedesk.ticket.dto.AuditEntryResponse;
+import com.tcc.servicedesk.ticket.dto.CategoryResponse;
 import com.tcc.servicedesk.ticket.dto.CreateTicketRequest;
+import com.tcc.servicedesk.ticket.dto.QueueResponse;
 import com.tcc.servicedesk.ticket.dto.TicketResponse;
 import com.tcc.servicedesk.ticket.dto.TicketSearchCriteria;
 import com.tcc.servicedesk.ticket.dto.UpdateStatusRequest;
@@ -68,5 +70,15 @@ public class TicketController {
     public TicketResponse getTicket(
             @AuthenticationPrincipal UserPrincipal principal, @PathVariable Long id) {
         return ticketService.getById(id, principal);
+    }
+
+    @GetMapping("/categories")
+    public List<CategoryResponse> getCategories() {
+        return ticketService.listCategories();
+    }
+
+    @GetMapping("/queues")
+    public List<QueueResponse> getQueues() {
+        return ticketService.listQueues();
     }
 }
