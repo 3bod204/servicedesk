@@ -5,6 +5,7 @@ import com.tcc.servicedesk.user.dto.CreateUserRequest;
 import com.tcc.servicedesk.user.dto.UpdateProfileRequest;
 import com.tcc.servicedesk.user.dto.UserResponse;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -102,9 +103,41 @@ public class UserService {
     }
 
     public List<UserResponse> getUsersByQueue(Long queueId) {
-        return userRepository.findByQueues_IdAndActiveTrueAndDeletedFalse(queueId).stream()
+        return userRepository
+                .findByQueues_IdAndActiveTrueAndDeletedFalseAndRoles_NameIn(
+                        queueId, List.of("ROLE_AGENT", "ROLE_MANAGER"))
+                .stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    public List<UserResponse> listAllUsers() {
+        return userRepository.findAll().stream()
+                .filter(u -> !u.isDeleted())
+                .map(this::toResponse)
+                .toList();
+    }
+
+    public UserResponse updateRoles(Long userId, Set<String> roleNames) {
+        User user = findUserOrThrow(userId);
+
+        Set<Role> newRoles = new HashSet<>();
+        for (String roleName : roleNames) {
+            Role role =
+                    roleRepository
+                            .findByName(roleName)
+                            .orElseThrow(
+                                    () ->
+                                            new ResponseStatusException(
+                                                    HttpStatus.BAD_REQUEST,
+                                                    "Unknown role: " + roleName));
+            newRoles.add(role);
+        }
+
+        user.getRoles().clear();
+        user.getRoles().addAll(newRoles);
+
+        return toResponse(user);
     }
 
     private User findUserOrThrow(Long userId) {

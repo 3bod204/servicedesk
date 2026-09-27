@@ -6,8 +6,12 @@ import com.tcc.servicedesk.ticket.dto.AuditEntryResponse;
 import com.tcc.servicedesk.ticket.dto.CategoryResponse;
 import com.tcc.servicedesk.ticket.dto.CreateTicketRequest;
 import com.tcc.servicedesk.ticket.dto.QueueResponse;
+import com.tcc.servicedesk.ticket.dto.SlaPolicyResponse;
 import com.tcc.servicedesk.ticket.dto.TicketResponse;
 import com.tcc.servicedesk.ticket.dto.TicketSearchCriteria;
+import com.tcc.servicedesk.ticket.dto.UpdateCategoryRequest;
+import com.tcc.servicedesk.ticket.dto.UpdateQueueRequest;
+import com.tcc.servicedesk.ticket.dto.UpdateSlaPolicyRequest;
 import com.tcc.servicedesk.ticket.dto.UpdateStatusRequest;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -80,5 +84,56 @@ public class TicketController {
     @GetMapping("/queues")
     public List<QueueResponse> getQueues() {
         return ticketService.listQueues();
+    }
+
+    @PostMapping("/admin/queues")
+    @PreAuthorize("hasRole('ADMIN')")
+    public QueueResponse createQueue(@Valid @RequestBody UpdateQueueRequest request) {
+        return ticketService.createQueue(request);
+    }
+
+    @PutMapping("/admin/queues/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public QueueResponse updateQueue(
+            @PathVariable Long id, @Valid @RequestBody UpdateQueueRequest request) {
+        return ticketService.updateQueue(id, request);
+    }
+
+    @GetMapping("/admin/queues")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<QueueResponse> listAllQueues() {
+        return ticketService.listAllQueues();
+    }
+
+    @PostMapping("/admin/categories")
+    @PreAuthorize("hasRole('ADMIN')")
+    public CategoryResponse createCategory(@Valid @RequestBody UpdateCategoryRequest request) {
+        return ticketService.createCategory(request);
+    }
+
+    @PutMapping("/admin/categories/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public CategoryResponse updateCategory(
+            @PathVariable Long id, @Valid @RequestBody UpdateCategoryRequest request) {
+        return ticketService.updateCategory(id, request);
+    }
+
+    @GetMapping("/admin/categories")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<CategoryResponse> listAllCategories() {
+        return ticketService.listAllCategories();
+    }
+
+    @GetMapping("/admin/sla-policies")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<SlaPolicyResponse> listSlaPolicies() {
+        return ticketService.listSlaPolicies();
+    }
+
+    @PutMapping("/admin/sla-policies/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public SlaPolicyResponse updateSlaPolicy(
+            @PathVariable Long id, @Valid @RequestBody UpdateSlaPolicyRequest request) {
+        return ticketService.updateSlaPolicy(id, request);
     }
 }

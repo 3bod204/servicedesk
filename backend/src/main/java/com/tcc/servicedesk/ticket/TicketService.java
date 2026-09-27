@@ -7,8 +7,12 @@ import com.tcc.servicedesk.ticket.dto.AuditEntryResponse;
 import com.tcc.servicedesk.ticket.dto.CategoryResponse;
 import com.tcc.servicedesk.ticket.dto.CreateTicketRequest;
 import com.tcc.servicedesk.ticket.dto.QueueResponse;
+import com.tcc.servicedesk.ticket.dto.SlaPolicyResponse;
 import com.tcc.servicedesk.ticket.dto.TicketResponse;
 import com.tcc.servicedesk.ticket.dto.TicketSearchCriteria;
+import com.tcc.servicedesk.ticket.dto.UpdateCategoryRequest;
+import com.tcc.servicedesk.ticket.dto.UpdateQueueRequest;
+import com.tcc.servicedesk.ticket.dto.UpdateSlaPolicyRequest;
 import com.tcc.servicedesk.ticket.dto.UpdateStatusRequest;
 import com.tcc.servicedesk.user.User;
 import com.tcc.servicedesk.user.UserRepository;
@@ -215,6 +219,113 @@ public class TicketService {
         return toResponse(ticket);
     }
 
+    public QueueResponse createQueue(UpdateQueueRequest request) {
+        Queue queue =
+                Queue.builder()
+                        .name(request.name())
+                        .description(request.description())
+                        .active(true)
+                        .build();
+        queueRepository.save(queue);
+        return new QueueResponse(queue.getId(), queue.getName());
+    }
+
+    @Transactional
+    public QueueResponse updateQueue(Long id, UpdateQueueRequest request) {
+        Queue queue =
+                queueRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () ->
+                                        new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND, "Queue not found"));
+        queue.setName(request.name());
+        queue.setDescription(request.description());
+        queue.setActive(request.active());
+        return new QueueResponse(queue.getId(), queue.getName());
+    }
+
+    public List<QueueResponse> listAllQueues() {
+        return queueRepository.findAll().stream()
+                .map(q -> new QueueResponse(q.getId(), q.getName()))
+                .toList();
+    }
+
+    public CategoryResponse createCategory(UpdateCategoryRequest request) {
+        Queue queue =
+                queueRepository
+                        .findById(request.queueId())
+                        .orElseThrow(
+                                () ->
+                                        new ResponseStatusException(
+                                                HttpStatus.BAD_REQUEST, "Queue not found"));
+
+        Category category =
+                Category.builder().name(request.name()).queue(queue).active(true).build();
+        categoryRepository.save(category);
+        return new CategoryResponse(category.getId(), category.getName(), queue.getName());
+    }
+
+    @Transactional
+    public CategoryResponse updateCategory(Long id, UpdateCategoryRequest request) {
+        Category category =
+                categoryRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () ->
+                                        new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND, "Category not found"));
+        Queue queue =
+                queueRepository
+                        .findById(request.queueId())
+                        .orElseThrow(
+                                () ->
+                                        new ResponseStatusException(
+                                                HttpStatus.BAD_REQUEST, "Queue not found"));
+
+        category.setName(request.name());
+        category.setQueue(queue);
+        category.setActive(request.active());
+        return new CategoryResponse(category.getId(), category.getName(), queue.getName());
+    }
+
+    public List<CategoryResponse> listAllCategories() {
+        return categoryRepository.findAll().stream()
+                .map(c -> new CategoryResponse(c.getId(), c.getName(), c.getQueue().getName()))
+                .toList();
+    }
+
+    public List<SlaPolicyResponse> listSlaPolicies() {
+        return slaPolicyRepository.findAll().stream()
+                .map(
+                        p ->
+                                new SlaPolicyResponse(
+                                        p.getId(),
+                                        p.getPriority(),
+                                        p.getFirstResponseMinutes(),
+                                        p.getResolutionMinutes()))
+                .toList();
+    }
+
+    @Transactional
+    public SlaPolicyResponse updateSlaPolicy(Long id, UpdateSlaPolicyRequest request) {
+        SlaPolicy policy =
+                slaPolicyRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () ->
+                                        new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND, "SLA policy not found"));
+
+        policy.setFirstResponseMinutes(request.firstResponseMinutes());
+        policy.setResolutionMinutes(request.resolutionMinutes());
+        return new SlaPolicyResponse(
+                policy.getId(),
+                policy.getPriority(),
+                policy.getFirstResponseMinutes(),
+                policy.getResolutionMinutes());
+    }
+
     @Transactional
     public TicketResponse assignTicket(
             Long ticketId, Long actingUserId, AssignTicketRequest request) {
@@ -243,6 +354,18 @@ public class TicketService {
                                         new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND, "Assignee not found"));
 
+        boolean assigneeHasEligibleRole =
+                newAssignee.getRoles().stream()
+                        .anyMatch(
+                                r ->
+                                        r.getName().equals("ROLE_AGENT")
+                                                || r.getName().equals("ROLE_MANAGER"));
+
+        if (!assigneeHasEligibleRole) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Tickets can only be assigned to an agent or manager");
+        }
+
         boolean inSameQueue =
                 newAssignee.getQueues().stream()
                         .anyMatch(q -> q.getId().equals(ticket.getQueue().getId()));
@@ -251,7 +374,6 @@ public class TicketService {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN, "Assignee is not a member of this ticket's queue");
         }
-
         Instant now = Instant.now();
 
         User previousAssignee = ticket.getAssignee();

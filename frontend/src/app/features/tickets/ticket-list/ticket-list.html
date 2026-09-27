@@ -3,34 +3,55 @@
     <div class="page-title">Tickets</div>
     <div class="page-sub">{{ totalElements() }} tickets</div>
   </div>
-  <button class="btn btn-primary" (click)="createTicket()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
-    New Ticket
-  </button>
+  <div style="display:flex; gap:10px;">
+    @if (canExport) {
+      <button class="btn btn-secondary" [disabled]="exporting()" (click)="exportCsv()">
+        @if (exporting()) { Exporting… } @else { Export CSV }
+      </button>
+    }
+    <button class="btn btn-primary" (click)="createTicket()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
+      New Ticket
+    </button>
+  </div>
 </div>
 
 <div class="filter-bar">
-  <div class="tab-group">
-    <button class="tab" [class.active]="activeTab() === 'all'" (click)="setTab('all')">All</button>
-    <button class="tab" [class.active]="activeTab() === 'open'" (click)="setTab('open')">Open</button>
-    <button class="tab" [class.active]="activeTab() === 'mine'" (click)="setTab('mine')">Mine</button>
-    <button class="tab" [class.active]="activeTab() === 'resolved'" (click)="setTab('resolved')">Resolved</button>
-  </div>
-  <select class="flt-sel" [ngModel]="priorityFilter()" (ngModelChange)="priorityFilter.set($event)">
-    <option value="ALL">All Priorities</option>
-    <option value="URGENT">Urgent</option>
-    <option value="HIGH">High</option>
-    <option value="MEDIUM">Medium</option>
-    <option value="LOW">Low</option>
+  <select class="flt-sel" [(ngModel)]="filterStatus" (change)="applyFilters()">
+    <option value="">All Statuses</option>
+    @for (s of allStatuses; track s) {
+      <option [value]="s">{{ statusLabel(s) }}</option>
+    }
   </select>
+
+  <select class="flt-sel" [(ngModel)]="filterPriority" (change)="applyFilters()">
+    <option value="">All Priorities</option>
+    <option value="LOW">Low</option>
+    <option value="MEDIUM">Medium</option>
+    <option value="HIGH">High</option>
+    <option value="URGENT">Urgent</option>
+  </select>
+
+  <input type="date" class="flt-sel" [(ngModel)]="filterDateFrom" (change)="applyFilters()" title="Created from">
+  <input type="date" class="flt-sel" [(ngModel)]="filterDateTo" (change)="applyFilters()" title="Created to">
+
+  <label style="display:flex; align-items:center; gap:6px; font-size:13px; color:var(--text-secondary); white-space:nowrap;">
+    <input type="checkbox" [(ngModel)]="filterMineOnly" (change)="applyFilters()">
+    Mine only
+  </label>
+
+  <input type="text" class="flt-sel" style="flex:1; min-width:140px;" placeholder="Search…"
+    [(ngModel)]="filterSearch" (keyup.enter)="applyFilters()">
+
   <span class="spacer"></span>
+  <a class="clear-link" href="#" (click)="clearFilters(); $event.preventDefault()">Clear filters</a>
 </div>
 
 @if (loading()) {
   <div class="tbl-wrap"><div style="padding: 40px; text-align: center; color: var(--text-muted);">Loading tickets…</div></div>
 } @else if (errorMessage()) {
   <div class="tbl-wrap"><div style="padding: 40px; text-align: center; color: var(--status-reopened);">{{ errorMessage() }}</div></div>
-} @else if (filteredTickets().length === 0) {
+} @else if (tickets().length === 0) {
   <div class="tbl-wrap"><div style="padding: 40px; text-align: center; color: var(--text-muted);">No tickets found.</div></div>
 } @else {
   <div class="tbl-wrap">
@@ -41,7 +62,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (ticket of filteredTickets(); track ticket.id) {
+        @for (ticket of tickets(); track ticket.id) {
           <tr (click)="openTicket(ticket.id)">
             <td><div class="tkt-ref">{{ ticket.reference }}</div></td>
             <td>
@@ -72,7 +93,7 @@
     </table>
 
     <div class="paginav">
-      <div class="paginav-info">Showing {{ page() * pageSize + 1 }}–{{ page() * pageSize + filteredTickets().length }} of {{ totalElements() }}</div>
+      <div class="paginav-info">Showing {{ page() * pageSize + 1 }}–{{ page() * pageSize + tickets().length }} of {{ totalElements() }}</div>
       <div class="paginav-btns">
         <button class="pg-btn" [disabled]="page() === 0" (click)="prevPage()">‹</button>
         <button class="pg-btn active">{{ page() + 1 }}</button>

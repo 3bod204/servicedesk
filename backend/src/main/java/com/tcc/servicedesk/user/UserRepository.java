@@ -11,4 +11,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmailIgnoreCase(String email);
 
     List<User> findByQueues_IdAndActiveTrueAndDeletedFalse(Long queueId);
+
+    List<User> findByQueues_IdAndActiveTrueAndDeletedFalseAndRoles_NameIn(
+            Long queueId, List<String> roleNames);
 }

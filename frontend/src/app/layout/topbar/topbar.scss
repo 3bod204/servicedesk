@@ -18,37 +18,6 @@
 }
 .crumb-active { color: var(--text-primary); font-weight: 600; }
 
-.topbar-search {
-  position: relative;
-  flex-shrink: 0;
-
-  input {
-    width: 260px;
-    height: 34px;
-    padding: 0 12px 0 34px;
-    background: var(--surface-hover);
-    border: 1px solid var(--border-default);
-    border-radius: var(--radius-full);
-    color: var(--text-primary);
-    font-family: inherit;
-    outline: none;
-
-    &:focus { border-color: var(--border-focus); box-shadow: var(--shadow-focus); }
-    &::placeholder { color: var(--text-muted); }
-  }
-}
-
-.search-ico {
-  position: absolute;
-  left: 11px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 14px;
-  height: 14px;
-  color: var(--text-muted);
-  pointer-events: none;
-}
-
 .topbar-actions {
   display: flex;
   align-items: center;

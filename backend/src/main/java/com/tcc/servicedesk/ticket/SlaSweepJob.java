@@ -6,6 +6,7 @@ import java.util.List;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class SlaSweepJob {
@@ -20,6 +21,7 @@ public class SlaSweepJob {
 
     @Scheduled(fixedRate = 5, timeUnit = java.util.concurrent.TimeUnit.MINUTES)
     @SchedulerLock(name = "sla-sweep", lockAtLeastFor = "1m", lockAtMostFor = "4m")
+    @Transactional
     public void sweep() {
         Instant now = Instant.now();
 

@@ -60,4 +60,17 @@ public class UserController {
     public List<UserResponse> getUsersByQueue(@PathVariable Long queueId) {
         return userService.getUsersByQueue(queueId);
     }
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<UserResponse> listUsers() {
+        return userService.listAllUsers();
+    }
+
+    @PutMapping("/{id}/roles")
+    @PreAuthorize("hasRole('ADMIN')")
+    public UserResponse updateRoles(
+            @PathVariable Long id, @Valid @RequestBody UpdateRolesRequest request) {
+        return userService.updateRoles(id, request.roleNames());
+    }
 }
