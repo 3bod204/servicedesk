@@ -17,6 +17,7 @@ export const routes: Routes = [
       { path: 'tickets/:id', data: { breadcrumb: 'Ticket Detail' }, loadComponent: () => import('./features/tickets/ticket-detail/ticket-detail').then(m => m.TicketDetail) },
       { path: 'dashboard', data: { breadcrumb: 'Dashboard' }, canActivate: [roleGuard(['ROLE_MANAGER', 'ROLE_ADMIN'])], loadComponent: () => import('./features/dashboard/dashboard').then(m => m.DashboardComponent) },
       { path: 'admin/users', data: { breadcrumb: 'Users' }, canActivate: [roleGuard(['ROLE_ADMIN'])], loadComponent: () => import('./features/admin/admin-users/admin-users').then(m => m.AdminUsers) },
+      { path: 'admin/settings', data: { breadcrumb: 'Configuration' }, canActivate: [roleGuard(['ROLE_ADMIN'])], loadComponent: () => import('./features/admin/admin-settings/admin-settings').then(m => m.AdminSettings) },
     ]
   },
   { path: '**', redirectTo: 'login' },

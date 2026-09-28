@@ -1,10 +1,13 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, effect, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TicketService } from '../../../core/services/ticket.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { UserService } from '../../../core/services/user.service';
 import { TicketResponse, TicketStatus, Priority, TicketSearchCriteria } from '../../../shared/models/ticket.model';
+import { QueueResponse } from '../../../shared/models/queue.model';
+import { UserResponse } from '../../../shared/models/user.model';
 
 const STATUS_LABELS: Record<TicketStatus, string> = {
   NEW: 'New', ASSIGNED: 'Assigned', IN_PROGRESS: 'In Progress',
@@ -33,8 +36,11 @@ export class TicketListComponent implements OnInit {
   loading = signal(true);
   errorMessage = signal<string | null>(null);
   exporting = signal(false);
+  filtersOpen = signal(false);
 
   allStatuses = ALL_STATUSES;
+  queues = signal<QueueResponse[]>([]);
+  assignableUsers = signal<UserResponse[]>([]);
 
   // Real filter state, sent directly to the backend
   filterStatus: TicketStatus | '' = '';
@@ -43,15 +49,33 @@ export class TicketListComponent implements OnInit {
   filterDateTo = '';
   filterSearch = '';
   filterMineOnly = false;
+  filterQueueId: number | '' = '';
+  filterAssigneeId: number | '' = '';
+
+  private assignableUsersLoaded = false;
 
   constructor(
     private ticketService: TicketService,
     private authService: AuthService,
+    private userService: UserService,
     private router: Router
-  ) {}
+  ) {
+    // currentUser() loads asynchronously after login/refresh, so fetch once it's
+    // actually available rather than checking it once during ngOnInit.
+    effect(() => {
+      if (!this.assignableUsersLoaded && this.canFilterByAssignee) {
+        this.assignableUsersLoaded = true;
+        this.userService.getAssignable().subscribe({
+          next: (users) => this.assignableUsers.set(users),
+          error: () => {}
+        });
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.loadTickets();
+    this.ticketService.getQueues().subscribe({ next: (queues) => this.queues.set(queues) });
   }
 
   private buildCriteria(): TicketSearchCriteria {
@@ -59,7 +83,8 @@ export class TicketListComponent implements OnInit {
     return {
       status: this.filterStatus || undefined,
       priority: this.filterPriority || undefined,
-      assigneeId: this.filterMineOnly ? myId : undefined,
+      queueId: this.filterQueueId || undefined,
+      assigneeId: this.filterMineOnly ? myId : (this.filterAssigneeId || undefined),
       createdFrom: this.filterDateFrom ? new Date(this.filterDateFrom).toISOString() : undefined,
       createdTo: this.filterDateTo ? new Date(this.filterDateTo).toISOString() : undefined,
       search: this.filterSearch || undefined
@@ -95,12 +120,29 @@ export class TicketListComponent implements OnInit {
     this.filterDateTo = '';
     this.filterSearch = '';
     this.filterMineOnly = false;
+    this.filterQueueId = '';
+    this.filterAssigneeId = '';
     this.applyFilters();
+  }
+
+  toggleFilters(): void {
+    this.filtersOpen.update(open => !open);
+  }
+
+  get activeFilterCount(): number {
+    return [
+      this.filterStatus, this.filterPriority, this.filterDateFrom, this.filterDateTo,
+      this.filterMineOnly, this.filterQueueId, this.filterAssigneeId
+    ].filter(v => v !== '' && v !== false).length;
   }
 
   get canExport(): boolean {
     const roles = this.authService.currentUser()?.roles ?? [];
     return roles.some(r => r === 'ROLE_MANAGER' || r === 'ROLE_ADMIN' || r === 'ROLE_AGENT');
+  }
+
+  get canFilterByAssignee(): boolean {
+    return this.canExport;
   }
 
   statusLabel(status: TicketStatus): string {

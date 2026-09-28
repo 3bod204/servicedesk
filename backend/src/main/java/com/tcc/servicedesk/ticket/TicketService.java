@@ -2,6 +2,8 @@ package com.tcc.servicedesk.ticket;
 
 import com.tcc.servicedesk.notification.NotificationService;
 import com.tcc.servicedesk.security.UserPrincipal;
+import com.tcc.servicedesk.ticket.dto.AdminCategoryResponse;
+import com.tcc.servicedesk.ticket.dto.AdminQueueResponse;
 import com.tcc.servicedesk.ticket.dto.AssignTicketRequest;
 import com.tcc.servicedesk.ticket.dto.AuditEntryResponse;
 import com.tcc.servicedesk.ticket.dto.CategoryResponse;
@@ -219,7 +221,12 @@ public class TicketService {
         return toResponse(ticket);
     }
 
-    public QueueResponse createQueue(UpdateQueueRequest request) {
+    @Transactional
+    public AdminQueueResponse createQueue(UpdateQueueRequest request) {
+        if (queueRepository.findByName(request.name()).isPresent()) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "A queue with that name already exists");
+        }
         Queue queue =
                 Queue.builder()
                         .name(request.name())
@@ -227,11 +234,11 @@ public class TicketService {
                         .active(true)
                         .build();
         queueRepository.save(queue);
-        return new QueueResponse(queue.getId(), queue.getName());
+        return toAdminQueue(queue);
     }
 
     @Transactional
-    public QueueResponse updateQueue(Long id, UpdateQueueRequest request) {
+    public AdminQueueResponse updateQueue(Long id, UpdateQueueRequest request) {
         Queue queue =
                 queueRepository
                         .findById(id)
@@ -242,16 +249,16 @@ public class TicketService {
         queue.setName(request.name());
         queue.setDescription(request.description());
         queue.setActive(request.active());
-        return new QueueResponse(queue.getId(), queue.getName());
+        return toAdminQueue(queue);
     }
 
-    public List<QueueResponse> listAllQueues() {
-        return queueRepository.findAll().stream()
-                .map(q -> new QueueResponse(q.getId(), q.getName()))
-                .toList();
+    @Transactional
+    public List<AdminQueueResponse> listAllQueues() {
+        return queueRepository.findAll().stream().map(this::toAdminQueue).toList();
     }
 
-    public CategoryResponse createCategory(UpdateCategoryRequest request) {
+    @Transactional
+    public AdminCategoryResponse createCategory(UpdateCategoryRequest request) {
         Queue queue =
                 queueRepository
                         .findById(request.queueId())
@@ -259,15 +266,14 @@ public class TicketService {
                                 () ->
                                         new ResponseStatusException(
                                                 HttpStatus.BAD_REQUEST, "Queue not found"));
-
         Category category =
                 Category.builder().name(request.name()).queue(queue).active(true).build();
         categoryRepository.save(category);
-        return new CategoryResponse(category.getId(), category.getName(), queue.getName());
+        return toAdminCategory(category);
     }
 
     @Transactional
-    public CategoryResponse updateCategory(Long id, UpdateCategoryRequest request) {
+    public AdminCategoryResponse updateCategory(Long id, UpdateCategoryRequest request) {
         Category category =
                 categoryRepository
                         .findById(id)
@@ -282,17 +288,24 @@ public class TicketService {
                                 () ->
                                         new ResponseStatusException(
                                                 HttpStatus.BAD_REQUEST, "Queue not found"));
-
         category.setName(request.name());
         category.setQueue(queue);
         category.setActive(request.active());
-        return new CategoryResponse(category.getId(), category.getName(), queue.getName());
+        return toAdminCategory(category);
     }
 
-    public List<CategoryResponse> listAllCategories() {
-        return categoryRepository.findAll().stream()
-                .map(c -> new CategoryResponse(c.getId(), c.getName(), c.getQueue().getName()))
-                .toList();
+    @Transactional
+    public List<AdminCategoryResponse> listAllCategories() {
+        return categoryRepository.findAll().stream().map(this::toAdminCategory).toList();
+    }
+
+    private AdminQueueResponse toAdminQueue(Queue q) {
+        return new AdminQueueResponse(q.getId(), q.getName(), q.getDescription(), q.isActive());
+    }
+
+    private AdminCategoryResponse toAdminCategory(Category c) {
+        return new AdminCategoryResponse(
+                c.getId(), c.getName(), c.getQueue().getId(), c.getQueue().getName(), c.isActive());
     }
 
     public List<SlaPolicyResponse> listSlaPolicies() {
@@ -436,7 +449,8 @@ public class TicketService {
                         .and(
                                 TicketSpecifications.createdBetween(
                                         criteria.createdFrom(), criteria.createdTo()))
-                        .and(TicketSpecifications.searchText(criteria.search()));
+                        .and(TicketSpecifications.searchText(criteria.search()))
+                        .and(TicketSpecifications.triageOrder());
 
         if (isAgentOnly) {
             User agent =

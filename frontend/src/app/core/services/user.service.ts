@@ -12,6 +12,10 @@ export class UserService {
     return this.http.get<UserResponse[]>(`${environment.apiBaseUrl}/users/by-queue/${queueId}`);
   }
 
+  getAssignable(): Observable<UserResponse[]> {
+    return this.http.get<UserResponse[]>(`${environment.apiBaseUrl}/users/assignable`);
+  }
+
   listAll(): Observable<UserResponse[]> {
   return this.http.get<UserResponse[]>(environment.apiBaseUrl + '/users');
 }

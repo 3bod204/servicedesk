@@ -1,5 +1,7 @@
 package com.tcc.servicedesk.ticket;
 
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Predicate;
 import java.time.Instant;
 import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
@@ -65,5 +67,21 @@ public final class TicketSpecifications {
                 (queueIds == null || queueIds.isEmpty())
                         ? cb.disjunction()
                         : root.get("queue").get("id").in(queueIds);
+    }
+
+    public static Specification<Ticket> triageOrder() {
+        return (root, query, cb) -> {
+            Predicate finished = root.get("status").in(TicketStatus.RESOLVED, TicketStatus.CLOSED);
+            Predicate breached =
+                    cb.and(
+                            cb.not(finished),
+                            cb.lessThan(root.get("slaDueAt"), cb.literal(Instant.now())));
+
+            Expression<Integer> rank =
+                    cb.<Integer>selectCase().when(breached, 0).when(finished, 2).otherwise(1);
+
+            query.orderBy(cb.asc(rank), cb.asc(root.<Instant>get("slaDueAt")));
+            return cb.conjunction();
+        };
     }
 }

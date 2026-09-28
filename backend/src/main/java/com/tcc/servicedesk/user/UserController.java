@@ -61,6 +61,12 @@ public class UserController {
         return userService.getUsersByQueue(queueId);
     }
 
+    @GetMapping("/assignable")
+    @PreAuthorize("hasAnyRole('AGENT', 'MANAGER', 'ADMIN')")
+    public List<UserResponse> getAssignableUsers() {
+        return userService.getAssignableUsers();
+    }
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> listUsers() {

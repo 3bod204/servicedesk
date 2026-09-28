@@ -1,6 +1,8 @@
 package com.tcc.servicedesk.ticket;
 
 import com.tcc.servicedesk.security.UserPrincipal;
+import com.tcc.servicedesk.ticket.dto.AdminCategoryResponse;
+import com.tcc.servicedesk.ticket.dto.AdminQueueResponse;
 import com.tcc.servicedesk.ticket.dto.AssignTicketRequest;
 import com.tcc.servicedesk.ticket.dto.AuditEntryResponse;
 import com.tcc.servicedesk.ticket.dto.CategoryResponse;
@@ -88,39 +90,39 @@ public class TicketController {
 
     @PostMapping("/admin/queues")
     @PreAuthorize("hasRole('ADMIN')")
-    public QueueResponse createQueue(@Valid @RequestBody UpdateQueueRequest request) {
+    public AdminQueueResponse createQueue(@Valid @RequestBody UpdateQueueRequest request) {
         return ticketService.createQueue(request);
     }
 
     @PutMapping("/admin/queues/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public QueueResponse updateQueue(
+    public AdminQueueResponse updateQueue(
             @PathVariable Long id, @Valid @RequestBody UpdateQueueRequest request) {
         return ticketService.updateQueue(id, request);
     }
 
     @GetMapping("/admin/queues")
     @PreAuthorize("hasRole('ADMIN')")
-    public List<QueueResponse> listAllQueues() {
+    public List<AdminQueueResponse> listAllQueues() {
         return ticketService.listAllQueues();
     }
 
     @PostMapping("/admin/categories")
     @PreAuthorize("hasRole('ADMIN')")
-    public CategoryResponse createCategory(@Valid @RequestBody UpdateCategoryRequest request) {
+    public AdminCategoryResponse createCategory(@Valid @RequestBody UpdateCategoryRequest request) {
         return ticketService.createCategory(request);
     }
 
     @PutMapping("/admin/categories/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public CategoryResponse updateCategory(
+    public AdminCategoryResponse updateCategory(
             @PathVariable Long id, @Valid @RequestBody UpdateCategoryRequest request) {
         return ticketService.updateCategory(id, request);
     }
 
     @GetMapping("/admin/categories")
     @PreAuthorize("hasRole('ADMIN')")
-    public List<CategoryResponse> listAllCategories() {
+    public List<AdminCategoryResponse> listAllCategories() {
         return ticketService.listAllCategories();
     }
 

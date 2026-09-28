@@ -111,6 +111,15 @@ public class UserService {
                 .toList();
     }
 
+    public List<UserResponse> getAssignableUsers() {
+        return userRepository
+                .findByActiveTrueAndDeletedFalseAndRoles_NameInOrderByFullNameAsc(
+                        List.of("ROLE_AGENT", "ROLE_MANAGER"))
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
     public List<UserResponse> listAllUsers() {
         return userRepository.findAll().stream()
                 .filter(u -> !u.isDeleted())

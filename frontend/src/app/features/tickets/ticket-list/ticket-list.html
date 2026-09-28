@@ -17,35 +17,64 @@
 </div>
 
 <div class="filter-bar">
-  <select class="flt-sel" [(ngModel)]="filterStatus" (change)="applyFilters()">
-    <option value="">All Statuses</option>
-    @for (s of allStatuses; track s) {
-      <option [value]="s">{{ statusLabel(s) }}</option>
-    }
-  </select>
-
-  <select class="flt-sel" [(ngModel)]="filterPriority" (change)="applyFilters()">
-    <option value="">All Priorities</option>
-    <option value="LOW">Low</option>
-    <option value="MEDIUM">Medium</option>
-    <option value="HIGH">High</option>
-    <option value="URGENT">Urgent</option>
-  </select>
-
-  <input type="date" class="flt-sel" [(ngModel)]="filterDateFrom" (change)="applyFilters()" title="Created from">
-  <input type="date" class="flt-sel" [(ngModel)]="filterDateTo" (change)="applyFilters()" title="Created to">
-
-  <label style="display:flex; align-items:center; gap:6px; font-size:13px; color:var(--text-secondary); white-space:nowrap;">
-    <input type="checkbox" [(ngModel)]="filterMineOnly" (change)="applyFilters()">
-    Mine only
-  </label>
-
-  <input type="text" class="flt-sel" style="flex:1; min-width:140px;" placeholder="Search…"
+  <input type="text" class="flt-sel flt-search" placeholder="Search tickets…"
     [(ngModel)]="filterSearch" (keyup.enter)="applyFilters()">
 
-  <span class="spacer"></span>
-  <a class="clear-link" href="#" (click)="clearFilters(); $event.preventDefault()">Clear filters</a>
+  <button type="button" class="btn btn-secondary flt-toggle" [class.active]="filtersOpen()" (click)="toggleFilters()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M7 12h10M10 18h4"></path></svg>
+    Filters
+    @if (activeFilterCount > 0) {
+      <span class="flt-count">{{ activeFilterCount }}</span>
+    }
+  </button>
+
+  @if (activeFilterCount > 0) {
+    <a class="clear-link" href="#" (click)="clearFilters(); $event.preventDefault()">Clear filters</a>
+  }
 </div>
+
+@if (filtersOpen()) {
+  <div class="filter-panel">
+    <select class="flt-sel" [(ngModel)]="filterStatus" (change)="applyFilters()">
+      <option value="">All Statuses</option>
+      @for (s of allStatuses; track s) {
+        <option [value]="s">{{ statusLabel(s) }}</option>
+      }
+    </select>
+
+    <select class="flt-sel" [(ngModel)]="filterPriority" (change)="applyFilters()">
+      <option value="">All Priorities</option>
+      <option value="LOW">Low</option>
+      <option value="MEDIUM">Medium</option>
+      <option value="HIGH">High</option>
+      <option value="URGENT">Urgent</option>
+    </select>
+
+    <input type="date" class="flt-sel" [(ngModel)]="filterDateFrom" (change)="applyFilters()" title="Created from">
+    <input type="date" class="flt-sel" [(ngModel)]="filterDateTo" (change)="applyFilters()" title="Created to">
+
+    <select class="flt-sel" [(ngModel)]="filterQueueId" (change)="applyFilters()">
+      <option [ngValue]="''">All Queues</option>
+      @for (q of queues(); track q.id) {
+        <option [ngValue]="q.id">{{ q.name }}</option>
+      }
+    </select>
+
+    @if (canFilterByAssignee) {
+      <select class="flt-sel" [(ngModel)]="filterAssigneeId" (change)="applyFilters()">
+        <option [ngValue]="''">All Assignees</option>
+        @for (u of assignableUsers(); track u.id) {
+          <option [ngValue]="u.id">{{ u.fullName }}</option>
+        }
+      </select>
+    }
+
+    <label class="flt-check">
+      <input type="checkbox" [(ngModel)]="filterMineOnly" (change)="applyFilters()">
+      Assigned to me
+    </label>
+  </div>
+}
 
 @if (loading()) {
   <div class="tbl-wrap"><div style="padding: 40px; text-align: center; color: var(--text-muted);">Loading tickets…</div></div>

@@ -18,7 +18,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 const PRIORITY_COLORS: Record<string, string> = {
-  LOW: '#475569', MEDIUM: '#B45309', HIGH: '#C2410C', URGENT: '#B91C1C'
+  LOW: '#15803D', MEDIUM: '#A16207', HIGH: '#EA580C', URGENT: '#DC2626'
 };
 
 @Component({

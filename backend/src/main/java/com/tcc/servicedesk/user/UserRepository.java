@@ -14,4 +14,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByQueues_IdAndActiveTrueAndDeletedFalseAndRoles_NameIn(
             Long queueId, List<String> roleNames);
+
+    List<User> findByActiveTrueAndDeletedFalseAndRoles_NameInOrderByFullNameAsc(
+            List<String> roleNames);
 }
