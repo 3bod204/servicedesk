@@ -1,6 +1,26 @@
 # Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
 version: v1.5.0
 ignore:
+  SNYK-JAVA-COMFASTERXMLJACKSONCORE-20059179:
+    - '*':
+        reason: >-
+          No released version fixes this: introduced by flyway-core's
+          jackson-dataformat-toml dependency on jackson-core@2.17.2.
+          Same as the other jackson findings here - no published Maven
+          Central release actually fixes it (verified 2026-09-27); real
+          fix requires bumping flyway-core to a newer major version,
+          tracked as a separate upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-COMFASTERXMLJACKSONCORE-20059683:
+    - '*':
+        reason: >-
+          No released version fixes this: Snyk lists 2.18.11/2.21.7/2.22.3
+          as fixed versions, but none exist on Maven Central as of
+          2026-09-27 (latest real jackson-databind release is 2.19.0,
+          which remains vulnerable). Introduced via jjwt-jackson's
+          jackson-databind dependency. Revisit once Jackson ships a real
+          fix.
+        expires: 2026-12-15T00:00:00.000Z
   SNYK-JAVA-COMFASTERXMLJACKSONCORE-15365924:
     - '*':
         reason: >-
