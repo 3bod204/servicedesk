@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { SidebarService } from '../../core/services/sidebar.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -10,7 +11,7 @@ import { AuthService } from '../../core/services/auth.service';
   styleUrl: './sidebar.scss'
 })
 export class SidebarComponent {
-  constructor(public authService: AuthService) {}
+  constructor(public authService: AuthService, public sidebarService: SidebarService) {}
 
   get isAdmin(): boolean {
     const roles = this.authService.currentUser()?.roles ?? [];

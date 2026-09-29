@@ -1,6 +1,6 @@
 <div class="app-shell">
   <app-sidebar></app-sidebar>
-  <div class="main-area">
+  <div class="main-area" [class.sidebar-collapsed]="sidebarService.collapsed()">
     <app-topbar [breadcrumb]="breadcrumb()"></app-topbar>
     <div class="page">
       <router-outlet></router-outlet>

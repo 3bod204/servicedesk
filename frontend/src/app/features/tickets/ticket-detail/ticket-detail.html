@@ -148,16 +148,19 @@
       <div class="info-card">
         <div class="info-sec">
           <div class="info-lbl">Status</div>
-          <select class="info-sel" [ngModel]="t.status" (ngModelChange)="changeStatus($event)" [disabled]="statusChanging()">
+          <select class="info-sel" [ngModel]="draftStatus()" (ngModelChange)="draftStatus.set($event)" [disabled]="statusLocked() || savingChanges()">
             @for (s of availableStatuses(); track s) {
               <option [value]="s">{{ statusLabel(s) }}</option>
             }
           </select>
+          @if (statusLocked()) {
+            <div class="info-hint">Assign this ticket first to move it out of New.</div>
+          }
         </div>
         <div class="info-sec">
           <div class="info-lbl">Assignee</div>
           @if (!isRequesterOnly) {
-            <select class="info-sel" [ngModel]="t.assigneeId" (ngModelChange)="assignTicket($event)" [disabled]="assigneeChanging()">
+            <select class="info-sel" [ngModel]="draftAssigneeId()" (ngModelChange)="draftAssigneeId.set($event)" [disabled]="savingChanges()">
               <option [ngValue]="null" disabled>Select an assignee…</option>
               @for (member of queueMembers(); track member.id) {
                 <option [value]="member.id">{{ member.fullName }}</option>
@@ -172,6 +175,13 @@
             <span style="font-size:13px;color:var(--text-muted);">Unassigned</span>
           }
         </div>
+        @if (!isRequesterOnly) {
+          <div class="info-sec">
+            <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center;" [disabled]="!isDirty() || savingChanges()" (click)="saveDetails()">
+              @if (savingChanges()) { Saving… } @else { Save }
+            </button>
+          </div>
+        }
         <div class="info-sec">
           <div class="info-lbl">Requester</div>
           <div class="info-person">

@@ -4,6 +4,7 @@ import { filter, map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { SidebarComponent } from '../sidebar/sidebar';
 import { Topbar } from '../topbar/topbar';
+import { SidebarService } from '../../core/services/sidebar.service';
 
 @Component({
   selector: 'app-shell',
@@ -15,6 +16,7 @@ import { Topbar } from '../topbar/topbar';
 export class AppShell {
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
+  readonly sidebarService = inject(SidebarService);
 
   breadcrumb = toSignal(
     this.router.events.pipe(

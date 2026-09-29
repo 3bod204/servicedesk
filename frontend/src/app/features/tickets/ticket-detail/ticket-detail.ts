@@ -57,9 +57,26 @@ export class TicketDetail implements OnInit {
   postingComment = signal(false);
   replyingTo = signal<CommentResponse | null>(null);
 
-  statusChanging = signal(false);
-  assigneeChanging = signal(false);
   uploadingFile = signal(false);
+
+  draftStatus = signal<TicketStatus | null>(null);
+  draftAssigneeId = signal<number | null>(null);
+  savingChanges = signal(false);
+
+  isDirty = computed(() => {
+    const t = this.ticket();
+    if (!t) return false;
+    return this.draftStatus() !== t.status || this.draftAssigneeId() !== t.assigneeId;
+  });
+
+  // A brand-new ticket can only move forward by assigning it (the backend
+  // auto-transitions NEW -> ASSIGNED when that happens), so lock the status
+  // picker until an assignee is chosen.
+  statusLocked = computed(() => {
+    const t = this.ticket();
+    if (!t) return true;
+    return t.status === 'NEW' && this.draftAssigneeId() === null;
+  });
 
   threadedComments = computed(() => {
     const all = this.comments();
@@ -137,6 +154,7 @@ export class TicketDetail implements OnInit {
     this.ticketService.getById(id).subscribe({
       next: (t) => {
         this.ticket.set(t);
+        this.syncDrafts(t);
         this.loading.set(false);
         this.userService.getByQueue(t.queueId).subscribe(users => this.queueMembers.set(users));
       },
@@ -208,50 +226,56 @@ export class TicketDetail implements OnInit {
     this.replyingTo.set(null);
   }
 
-  changeStatus(newStatus: string): void {
-    const t = this.ticket();
-    if (!t || newStatus === t.status) return;
+  private syncDrafts(t: TicketResponse): void {
+    this.draftStatus.set(t.status);
+    this.draftAssigneeId.set(t.assigneeId);
+  }
 
-    const label = STATUS_LABELS[newStatus as TicketStatus] ?? newStatus;
-    if (!confirm(`Change status to "${label}"?`)) return;
+  saveDetails(): void {
+    const t = this.ticket();
+    if (!t || !this.isDirty() || this.savingChanges()) return;
 
     this.errorMessage.set(null);
-    this.statusChanging.set(true);
+    this.savingChanges.set(true);
 
-    this.ticketService.changeStatus(t.id, { status: newStatus as TicketStatus }).subscribe({
-      next: (updated) => {
-        this.ticket.set(updated);
-        this.statusChanging.set(false);
-        this.ticketService.getAudit(t.id).subscribe(a => this.audit.set(a));
-      },
+    const assigneeChanged = this.draftAssigneeId() !== t.assigneeId;
+
+    if (assigneeChanged && this.draftAssigneeId() !== null) {
+      this.ticketService.assign(t.id, { assigneeId: this.draftAssigneeId()! }).subscribe({
+        next: (updated) => this.applyStatusIfNeeded(t, updated),
+        error: () => {
+          this.errorMessage.set("Could not assign — check the person belongs to this ticket's queue.");
+          this.savingChanges.set(false);
+        }
+      });
+    } else {
+      this.applyStatusIfNeeded(t, t);
+    }
+  }
+
+  private applyStatusIfNeeded(original: TicketResponse, current: TicketResponse): void {
+    const wantedStatus = this.draftStatus();
+
+    if (wantedStatus === null || wantedStatus === original.status || wantedStatus === current.status) {
+      this.finishSave(current);
+      return;
+    }
+
+    this.ticketService.changeStatus(current.id, { status: wantedStatus }).subscribe({
+      next: (updated) => this.finishSave(updated),
       error: () => {
         this.errorMessage.set('That status change is not allowed from the current state.');
-        this.statusChanging.set(false);
+        this.ticket.set(current);
+        this.savingChanges.set(false);
       }
     });
   }
 
-  assignTicket(assigneeIdStr: string): void {
-    const t = this.ticket();
-    if (!t || !assigneeIdStr) return;
-
-    const member = this.queueMembers().find(m => m.id === Number(assigneeIdStr));
-    if (!confirm(`Assign this ticket to ${member?.fullName ?? 'this person'}?`)) return;
-
-    this.errorMessage.set(null);
-    this.assigneeChanging.set(true);
-
-    this.ticketService.assign(t.id, { assigneeId: Number(assigneeIdStr) }).subscribe({
-      next: (updated) => {
-        this.ticket.set(updated);
-        this.assigneeChanging.set(false);
-        this.ticketService.getAudit(t.id).subscribe(a => this.audit.set(a));
-      },
-      error: () => {
-        this.errorMessage.set("Could not assign — check the person belongs to this ticket's queue.");
-        this.assigneeChanging.set(false);
-      }
-    });
+  private finishSave(updated: TicketResponse): void {
+    this.ticket.set(updated);
+    this.syncDrafts(updated);
+    this.savingChanges.set(false);
+    this.ticketService.getAudit(updated.id).subscribe(a => this.audit.set(a));
   }
 
   onFileSelected(event: Event): void {

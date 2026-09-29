@@ -1,4 +1,4 @@
-<aside class="sidebar">
+<aside class="sidebar" [class.collapsed]="sidebarService.collapsed()">
   <div class="sidebar-logo">
     <div class="logo-icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -14,50 +14,62 @@
   <nav class="sidebar-nav">
     <div class="nav-section">My Workspace</div>
 
-    <a class="nav-item" routerLink="/tickets" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+    <a class="nav-item" routerLink="/tickets" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" title="All Tickets">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M9 12h6M9 8h6M9 16h4M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z"></path>
       </svg>
-      All Tickets
+      <span class="nav-label">All Tickets</span>
     </a>
 
-    <a class="nav-item" routerLink="/tickets/new">
+    <a class="nav-item" routerLink="/tickets/new" title="New Ticket">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"></circle><path d="M12 8v8M8 12h8"></path>
       </svg>
-      New Ticket
+      <span class="nav-label">New Ticket</span>
     </a>
 
     @if (isManagerOrAdmin) {
       <div class="nav-section">Reports</div>
-      <a class="nav-item" routerLink="/dashboard" routerLinkActive="active">
+      <a class="nav-item" routerLink="/dashboard" routerLinkActive="active" title="Dashboard">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="12" width="5" height="9" rx="1"></rect><rect x="9.5" y="7" width="5" height="14" rx="1"></rect><rect x="16" y="3" width="5" height="18" rx="1"></rect>
         </svg>
-        Dashboard
+        <span class="nav-label">Dashboard</span>
       </a>
     }
 
     @if (isAdmin) {
       <div class="nav-section">Administration</div>
-      <a class="nav-item" routerLink="/admin/users" routerLinkActive="active">
+      <a class="nav-item" routerLink="/admin/users" routerLinkActive="active" title="Users">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path><circle cx="9" cy="7" r="4"></circle>
         </svg>
-        Users
+        <span class="nav-label">Users</span>
       </a>
-      <a class="nav-item" routerLink="/admin/settings" routerLinkActive="active">
+      <a class="nav-item" routerLink="/admin/settings" routerLinkActive="active" title="Configuration">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="3"></circle>
     <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path>
   </svg>
-  Configuration
+  <span class="nav-label">Configuration</span>
 </a>
     }
   </nav>
 
+  <button type="button" class="sidebar-toggle" (click)="sidebarService.toggle()"
+    [title]="sidebarService.collapsed() ? 'Expand sidebar' : 'Collapse sidebar'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      @if (sidebarService.collapsed()) {
+        <path d="M9 6l6 6-6 6"></path>
+      } @else {
+        <path d="M15 6l-6 6 6 6"></path>
+      }
+    </svg>
+    <span class="nav-label">Collapse</span>
+  </button>
+
   <div class="sidebar-footer">
-    <a class="user-card" routerLink="/profile">
+    <a class="user-card" routerLink="/profile" title="{{ authService.currentUser()?.fullName }}">
       <div class="av av-md av-blue">{{ initials }}</div>
       <div class="user-info">
         <div class="user-name">{{ authService.currentUser()?.fullName }}</div>
