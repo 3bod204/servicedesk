@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
@@ -22,14 +22,30 @@ export class AdminSettings implements OnInit {
   categories = signal<AdminCategory[]>([]);
   slaPolicies = signal<SlaPolicy[]>([]);
 
-  
+  queueSearch = signal('');
+  filteredQueues = computed(() => {
+    const term = this.queueSearch().trim().toLowerCase();
+    if (!term) return this.queues();
+    return this.queues().filter(q =>
+      q.name.toLowerCase().includes(term) || (q.description ?? '').toLowerCase().includes(term));
+  });
+
+  categorySearch = signal('');
+  filteredCategories = computed(() => {
+    const term = this.categorySearch().trim().toLowerCase();
+    if (!term) return this.categories();
+    return this.categories().filter(c =>
+      c.name.toLowerCase().includes(term) || c.queueName.toLowerCase().includes(term));
+  });
+
+  showAddQueueModal = signal(false);
   newQueueName = '';
   newQueueDescription = '';
   editingQueueId = signal<number | null>(null);
   editQueueName = '';
   editQueueDescription = '';
 
-  
+  showAddCategoryModal = signal(false);
   newCategoryName = '';
   newCategoryQueueId: number | null = null;
   editingCategoryId = signal<number | null>(null);
@@ -59,6 +75,17 @@ export class AdminSettings implements OnInit {
     this.adminService.listQueues().subscribe(q => this.queues.set(q));
   }
 
+  openAddQueueModal(): void {
+    this.newQueueName = '';
+    this.newQueueDescription = '';
+    this.errorMessage.set(null);
+    this.showAddQueueModal.set(true);
+  }
+
+  closeAddQueueModal(): void {
+    this.showAddQueueModal.set(false);
+  }
+
   createQueue(): void {
     if (!this.newQueueName.trim()) return;
     this.errorMessage.set(null);
@@ -71,6 +98,7 @@ export class AdminSettings implements OnInit {
       next: () => {
         this.newQueueName = '';
         this.newQueueDescription = '';
+        this.showAddQueueModal.set(false);
         this.loadQueues();
       },
       error: (err) => this.errorMessage.set(
@@ -119,6 +147,17 @@ export class AdminSettings implements OnInit {
     this.adminService.listCategories().subscribe(c => this.categories.set(c));
   }
 
+  openAddCategoryModal(): void {
+    this.newCategoryName = '';
+    this.newCategoryQueueId = null;
+    this.errorMessage.set(null);
+    this.showAddCategoryModal.set(true);
+  }
+
+  closeAddCategoryModal(): void {
+    this.showAddCategoryModal.set(false);
+  }
+
   createCategory(): void {
     if (!this.newCategoryName.trim() || this.newCategoryQueueId === null) return;
     this.errorMessage.set(null);
@@ -131,6 +170,7 @@ export class AdminSettings implements OnInit {
       next: () => {
         this.newCategoryName = '';
         this.newCategoryQueueId = null;
+        this.showAddCategoryModal.set(false);
         this.loadCategories();
       },
       error: () => this.errorMessage.set('Could not create category (that name may already exist in this queue).')

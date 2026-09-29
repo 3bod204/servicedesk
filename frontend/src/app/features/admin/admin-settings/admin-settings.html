@@ -17,19 +17,16 @@
 
 
 @if (activeTab() === 'queues') {
-  <div class="card">
-    <div class="card-body add-row">
-      <input class="form-inp" style="flex:1;" placeholder="Queue name" [(ngModel)]="newQueueName">
-      <input class="form-inp" style="flex:2;" placeholder="Description (optional)" [(ngModel)]="newQueueDescription">
-      <button class="btn btn-primary" [disabled]="!newQueueName.trim()" (click)="createQueue()">+ Add Queue</button>
-    </div>
+  <div class="toolbar-row">
+    <input class="form-inp search-inp" placeholder="Search queues…" [ngModel]="queueSearch()" (ngModelChange)="queueSearch.set($event)">
+    <button class="btn btn-primary" (click)="openAddQueueModal()">+ Add Queue</button>
   </div>
 
   <div class="tbl-wrap">
     <table>
       <thead><tr><th style="width:28%">Name</th><th style="width:36%">Description</th><th style="width:12%">Status</th><th></th></tr></thead>
       <tbody>
-        @for (q of queues(); track q.id) {
+        @for (q of filteredQueues(); track q.id) {
           <tr>
             @if (editingQueueId() === q.id) {
               <td><input class="form-inp" [(ngModel)]="editQueueName"></td>
@@ -55,26 +52,43 @@
   </div>
 }
 
+@if (showAddQueueModal()) {
+  <div class="modal-overlay" (click)="closeAddQueueModal()">
+    <div class="modal-panel" (click)="$event.stopPropagation()">
+      <div class="modal-hdr">
+        <div class="modal-title">Add Queue</div>
+        <button class="modal-close" (click)="closeAddQueueModal()" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <label class="modal-field">
+          <span>Queue name</span>
+          <input class="form-inp" placeholder="e.g. Service Desk" [(ngModel)]="newQueueName">
+        </label>
+        <label class="modal-field">
+          <span>Description (optional)</span>
+          <input class="form-inp" placeholder="e.g. General IT support requests" [(ngModel)]="newQueueDescription">
+        </label>
+      </div>
+      <div class="modal-ftr">
+        <button class="btn btn-secondary" (click)="closeAddQueueModal()">Cancel</button>
+        <button class="btn btn-primary" [disabled]="!newQueueName.trim()" (click)="createQueue()">+ Add Queue</button>
+      </div>
+    </div>
+  </div>
+}
+
 
 @if (activeTab() === 'categories') {
-  <div class="card">
-    <div class="card-body add-row">
-      <input class="form-inp" style="flex:2;" placeholder="Category name" [(ngModel)]="newCategoryName">
-      <select class="form-inp" style="flex:1;" [(ngModel)]="newCategoryQueueId">
-        <option [ngValue]="null">Select queue…</option>
-        @for (q of queues(); track q.id) {
-          @if (q.active) { <option [ngValue]="q.id">{{ q.name }}</option> }
-        }
-      </select>
-      <button class="btn btn-primary" [disabled]="!newCategoryName.trim() || newCategoryQueueId === null" (click)="createCategory()">+ Add Category</button>
-    </div>
+  <div class="toolbar-row">
+    <input class="form-inp search-inp" placeholder="Search categories…" [ngModel]="categorySearch()" (ngModelChange)="categorySearch.set($event)">
+    <button class="btn btn-primary" (click)="openAddCategoryModal()">+ Add Category</button>
   </div>
 
   <div class="tbl-wrap">
     <table>
       <thead><tr><th style="width:34%">Name</th><th style="width:30%">Queue</th><th style="width:12%">Status</th><th></th></tr></thead>
       <tbody>
-        @for (c of categories(); track c.id) {
+        @for (c of filteredCategories(); track c.id) {
           <tr>
             @if (editingCategoryId() === c.id) {
               <td><input class="form-inp" [(ngModel)]="editCategoryName"></td>
@@ -101,6 +115,36 @@
         }
       </tbody>
     </table>
+  </div>
+}
+
+@if (showAddCategoryModal()) {
+  <div class="modal-overlay" (click)="closeAddCategoryModal()">
+    <div class="modal-panel" (click)="$event.stopPropagation()">
+      <div class="modal-hdr">
+        <div class="modal-title">Add Category</div>
+        <button class="modal-close" (click)="closeAddCategoryModal()" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <label class="modal-field">
+          <span>Category name</span>
+          <input class="form-inp" placeholder="e.g. Password Reset" [(ngModel)]="newCategoryName">
+        </label>
+        <label class="modal-field">
+          <span>Queue</span>
+          <select class="form-inp" [(ngModel)]="newCategoryQueueId">
+            <option [ngValue]="null">Select queue…</option>
+            @for (q of queues(); track q.id) {
+              @if (q.active) { <option [ngValue]="q.id">{{ q.name }}</option> }
+            }
+          </select>
+        </label>
+      </div>
+      <div class="modal-ftr">
+        <button class="btn btn-secondary" (click)="closeAddCategoryModal()">Cancel</button>
+        <button class="btn btn-primary" [disabled]="!newCategoryName.trim() || newCategoryQueueId === null" (click)="createCategory()">+ Add Category</button>
+      </div>
+    </div>
   </div>
 }
 
