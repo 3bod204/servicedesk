@@ -25,6 +25,8 @@ export class AdminUsers implements OnInit {
   editingUserId = signal<number | null>(null);
   editingRoles = signal<Set<string>>(new Set());
 
+  failedAvatarUrls = signal<Set<string>>(new Set());
+
   createForm: FormGroup;
 
   constructor(private fb: FormBuilder, private userService: UserService) {
@@ -133,6 +135,10 @@ export class AdminUsers implements OnInit {
 
   roleLabel(role: string): string {
     return role.replace('ROLE_', '');
+  }
+
+  markAvatarFailed(url: string): void {
+    this.failedAvatarUrls.update(set => new Set(set).add(url));
   }
 
   initials(fullName: string): string {

@@ -70,7 +70,11 @@
 
   <div class="sidebar-footer">
     <a class="user-card" routerLink="/profile" title="{{ authService.currentUser()?.fullName }}">
-      <div class="av av-md av-blue">{{ initials }}</div>
+      @if (avatarUrl && avatarUrl !== failedAvatarUrl()) {
+        <img class="av av-md" [src]="avatarUrl" alt="" (error)="failedAvatarUrl.set(avatarUrl)">
+      } @else {
+        <div class="av av-md av-blue">{{ initials }}</div>
+      }
       <div class="user-info">
         <div class="user-name">{{ authService.currentUser()?.fullName }}</div>
         <div class="user-role">{{ roleLabel }}</div>

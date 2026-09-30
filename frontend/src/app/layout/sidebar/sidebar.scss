@@ -157,4 +157,5 @@
   flex-shrink: 0;
 }
 .av-md { width: 32px; height: 32px; font-size: 12px; }
+img.av { object-fit: cover; flex-shrink: 0; }
 .av-blue { background: var(--primary-600); }

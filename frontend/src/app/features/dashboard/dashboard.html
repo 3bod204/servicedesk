@@ -14,10 +14,6 @@
       <option [value]="q.id">{{ q.name }}</option>
     }
   </select>
-  <span class="spacer"></span>
-  <button class="btn btn-primary" [disabled]="exporting()" (click)="exportFullReport()">
-    @if (exporting()) { Exporting… } @else { Export Full Report }
-  </button>
 </div>
 
 <div class="kpi-grid">
@@ -25,7 +21,7 @@
     <div class="kpi-lbl">Avg. First Response</div>
     <div class="kpi-num">
       @if (avgFirstResponse()?.averageMinutes != null) {
-        {{ avgFirstResponse()!.averageMinutes! | number:'1.0-0' }}m
+        {{ (avgFirstResponse()!.averageMinutes! / 60) | number:'1.0-0' }}h
       } @else { — }
     </div>
   </div>
@@ -33,7 +29,7 @@
     <div class="kpi-lbl">Avg. Resolution Time</div>
     <div class="kpi-num">
       @if (avgResolution()?.averageMinutes != null) {
-        {{ (avgResolution()!.averageMinutes! / 60) | number:'1.1-1' }}h
+        {{ (avgResolution()!.averageMinutes! / 60) | number:'1.0-0' }}h
       } @else { — }
     </div>
   </div>

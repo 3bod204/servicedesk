@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { CreateUserRequest, UserResponse } from '../../shared/models/user.model';
+import { ChangePasswordRequest, CreateUserRequest, UpdateProfileRequest, UserResponse } from '../../shared/models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -34,5 +34,17 @@ export class UserService {
 
 updateRoles(userId: number, roleNames: string[]): Observable<UserResponse> {
   return this.http.put<UserResponse>(`${environment.apiBaseUrl}/users/${userId}/roles`, { roleNames });
+}
+
+getMe(): Observable<UserResponse> {
+  return this.http.get<UserResponse>(`${environment.apiBaseUrl}/users/me`);
+}
+
+updateProfile(request: UpdateProfileRequest): Observable<UserResponse> {
+  return this.http.put<UserResponse>(`${environment.apiBaseUrl}/users/me`, request);
+}
+
+changePassword(request: ChangePasswordRequest): Observable<void> {
+  return this.http.put<void>(`${environment.apiBaseUrl}/users/me/password`, request);
 }
 }

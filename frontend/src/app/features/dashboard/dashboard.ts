@@ -43,7 +43,6 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   slaCompliance = signal<SlaComplianceMetric | null>(null);
 
   loading = signal(true);
-  exporting = signal(false);
 
   private statusChart?: Chart;
   private priorityChart?: Chart;
@@ -159,42 +158,6 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         plugins: { legend: { display: false } },
         scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
       }
-    });
-  }
-
-  exportFullReport(): void {
-    this.exporting.set(true);
-    const criteria = this.currentCriteria();
-
-    forkJoin({
-      status: this.reportingService.ticketsByStatus(criteria),
-      priority: this.reportingService.ticketsByPriority(criteria),
-      firstResponse: this.reportingService.avgFirstResponse(criteria),
-      resolution: this.reportingService.avgResolution(criteria),
-      compliance: this.reportingService.slaCompliance(criteria),
-      workload: this.reportingService.agentWorkload(criteria)
-    }).subscribe(result => {
-      let csv = 'Tickets by Status\nstatus,count\n';
-      result.status.forEach(r => csv += `${r.status},${r.count}\n`);
-      csv += '\nTickets by Priority\npriority,count\n';
-      result.priority.forEach(r => csv += `${r.priority},${r.count}\n`);
-      csv += '\nAverage First Response Time\nmetric,minutes\n';
-      csv += `${result.firstResponse.metricName},${result.firstResponse.averageMinutes ?? ''}\n`;
-      csv += '\nAverage Resolution Time\nmetric,minutes\n';
-      csv += `${result.resolution.metricName},${result.resolution.averageMinutes ?? ''}\n`;
-      csv += '\nSLA Compliance\ntotal_resolved,compliant,percentage\n';
-      csv += `${result.compliance.totalResolved},${result.compliance.compliant},${result.compliance.compliancePercentage ?? ''}\n`;
-      csv += '\nAgent Workload\nagent_id,agent_name,open_ticket_count\n';
-      result.workload.forEach(r => csv += `${r.agentId},${r.agentName},${r.openTicketCount}\n`);
-
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'servicedesk-report.csv';
-      link.click();
-      window.URL.revokeObjectURL(url);
-      this.exporting.set(false);
     });
   }
 }

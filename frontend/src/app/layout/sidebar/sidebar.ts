@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { SidebarService } from '../../core/services/sidebar.service';
@@ -11,7 +11,13 @@ import { SidebarService } from '../../core/services/sidebar.service';
   styleUrl: './sidebar.scss'
 })
 export class SidebarComponent {
+  failedAvatarUrl = signal<string | null>(null);
+
   constructor(public authService: AuthService, public sidebarService: SidebarService) {}
+
+  get avatarUrl(): string | null {
+    return this.authService.currentUser()?.avatarUrl ?? null;
+  }
 
   get isAdmin(): boolean {
     const roles = this.authService.currentUser()?.roles ?? [];

@@ -89,6 +89,7 @@ tbody td:last-child { padding-right: 20px; }
   border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center;
   font-weight: 700; color: #fff; flex-shrink: 0; width: 32px; height: 32px; font-size: 11.5px; letter-spacing: 0.02em;
 }
+img.av { object-fit: cover; }
 .av-c0 { background: var(--primary-500); }
 .av-c1 { background: var(--status-assigned); }
 .av-c2 { background: var(--status-resolved); }

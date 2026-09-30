@@ -56,6 +56,12 @@ export class AuthService {
     return this.accessToken() !== null;
   }
 
+  refreshCurrentUser(): void {
+  this.http.get<UserResponse>(`${environment.apiBaseUrl}/users/me`).subscribe(user => {
+    this.currentUser.set(user);
+  });
+}
+
   private loadCurrentUser(): Observable<UserResponse> {
     return this.http.get<UserResponse>(`${this.usersUrl}/me`).pipe(
       tap(user => this.currentUser.set(user))

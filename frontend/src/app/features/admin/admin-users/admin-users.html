@@ -72,7 +72,11 @@
           <tr>
             <td>
               <div class="user-cell">
-                <div class="av" [ngClass]="avatarClass(user.fullName)">{{ initials(user.fullName) }}</div>
+                @if (user.avatarUrl && !failedAvatarUrls().has(user.avatarUrl)) {
+                  <img class="av" [src]="user.avatarUrl" alt="" (error)="markAvatarFailed(user.avatarUrl)">
+                } @else {
+                  <div class="av" [ngClass]="avatarClass(user.fullName)">{{ initials(user.fullName) }}</div>
+                }
                 <div>
                   <div class="user-name">{{ user.fullName }}</div>
                   <div class="user-email">{{ user.email }}</div>
