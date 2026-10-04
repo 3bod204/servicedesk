@@ -1,6 +1,35 @@
 # Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
 version: v1.5.0
 ignore:
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-20302843:
+    - '*':
+        reason: >-
+          CVE-2026-68525: fixed only in tomcat-embed-core 10.1.59, not yet
+          published to Maven Central as of 2026-10-04 (verified; latest
+          available is 10.1.54, which we already run). The flaw is in
+          Tomcat's container-managed FORM authentication bypassing a
+          GET/POST security-constraint - this app uses Spring Security's
+          JWT filter chain exclusively, not Tomcat FORM auth or
+          web.xml-style security constraints, so the vector doesn't apply
+          here regardless. Revisit once 10.1.59+ is released.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-20302889:
+    - '*':
+        reason: >-
+          CVE-2026-68569: same as -20302843, fixed only in 10.1.59 (not yet
+          on Maven Central). Affects Tomcat's DataSourceRealm with
+          CLIENT-CERT/SPNEGO authentication; this app has no Tomcat Realm
+          configured and uses JWT auth instead, so it isn't exposed.
+          Revisit once 10.1.59+ is released.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-20304748:
+    - '*':
+        reason: >-
+          CVE-2026-68763: same as -20302843, fixed only in 10.1.59 (not yet
+          on Maven Central). Resource exhaustion via HTTP/2 stream reset
+          backlog tracking; this app doesn't enable HTTP/2 on the embedded
+          Tomcat connector. Revisit once 10.1.59+ is released.
+        expires: 2026-12-15T00:00:00.000Z
   SNYK-JAVA-COMFASTERXMLJACKSONCORE-20059179:
     - '*':
         reason: >-
