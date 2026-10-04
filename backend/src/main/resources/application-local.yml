@@ -9,7 +9,7 @@ spring:
 
 app:
   jwt:
-    secret: TbfIE4WxhDctTTA6jOe1gfRf4FIimZlqY8hV6hxolfw=
+    secret: wWsi5qz+kWDbJuNrFyzpgu4YyGDrb/k1mebFmC+5mWg=
   storage:
     bucket: servicedesk-attachments
     endpoint: http://localhost:9000
