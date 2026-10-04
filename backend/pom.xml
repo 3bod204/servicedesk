@@ -24,6 +24,9 @@
     <shedlock.version>5.16.0</shedlock.version>
     <testcontainers.version>1.21.4</testcontainers.version>
     <lombok.version>1.18.46</lombok.version>
+    <!-- Overrides Spring Boot 3.3.4's managed 10.1.30, which has known
+         high/critical embedded Tomcat CVEs; 10.1.x is a safe patch bump. -->
+    <tomcat.version>10.1.54</tomcat.version>
   </properties>
 
   <dependencies>
