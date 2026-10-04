@@ -1,0 +1,99 @@
+<div class="create-page">
+  <div class="page-hdr" style="margin-bottom:24px;">
+    <div>
+      <div class="page-title">New Ticket</div>
+      <div class="page-sub">Report an IT issue or submit a service request</div>
+    </div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="section-card">
+      <div class="section-card-ttl">Ticket Details</div>
+      <div style="display:flex; flex-direction:column; gap:16px;">
+
+        <div class="form-grp">
+          <label class="form-lbl">Subject <span style="color:var(--status-reopened);">*</span></label>
+          <input class="form-inp" type="text" formControlName="title" placeholder="Brief description of the issue"
+            [class.invalid]="form.get('title')?.invalid && form.get('title')?.touched">
+          @if (form.get('title')?.invalid && form.get('title')?.touched) {
+            <div class="field-error">Subject is required.</div>
+          }
+        </div>
+
+        <div class="form-grp">
+          <label class="form-lbl">Description <span style="color:var(--status-reopened);">*</span></label>
+          <textarea class="form-inp" rows="5" formControlName="description"
+            placeholder="Describe the issue in detail — what happened, when, steps to reproduce, and any error messages…"
+            [class.invalid]="form.get('description')?.invalid && form.get('description')?.touched"></textarea>
+          @if (form.get('description')?.invalid && form.get('description')?.touched) {
+            <div class="field-error">Description is required.</div>
+          }
+        </div>
+
+        <div class="form-grp">
+          <label class="form-lbl">Category <span style="color:var(--status-reopened);">*</span></label>
+          <select class="form-select" formControlName="categoryId">
+            <option [ngValue]="null">Select category…</option>
+            @for (c of categories(); track c.id) {
+              <option [value]="c.id">{{ c.name }}</option>
+            }
+          </select>
+          @if (form.get('categoryId')?.invalid && form.get('categoryId')?.touched) {
+            <div class="field-error">Category is required.</div>
+          }
+        </div>
+
+        <div class="form-grp">
+          <label class="form-lbl">Priority</label>
+          <div class="prio-selector">
+            @for (p of priorities; track p) {
+              <button type="button" class="prio-opt" [attr.data-p]="p"
+                [class.selected]="form.value.priority === p"
+                (click)="selectPriority(p)">
+                {{ p | titlecase }}
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-ttl">Attachments</div>
+      <div class="dropzone" [class.drag-over]="isDragOver()"
+        (dragover)="onDragOver($event)" (dragleave)="onDragLeave()" (drop)="onDrop($event)"
+        (click)="fileInput.click()">
+        <svg class="dropzone-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"></path>
+        </svg>
+        <div class="dropzone-lbl">Drop files here or <span style="color:var(--text-link);">browse</span></div>
+        <div class="dropzone-hint">PDF · PNG · JPG · TXT · LOG · ZIP &nbsp;·&nbsp; Max 10 MB per file</div>
+      </div>
+      <input #fileInput type="file" multiple hidden accept=".pdf,.png,.jpg,.jpeg,.txt,.log,.zip" (change)="onFilesSelected($event)">
+
+      @if (selectedFiles().length > 0) {
+        <div class="file-chip-list">
+          @for (file of selectedFiles(); track file.name) {
+            <div class="file-chip">
+              <span>{{ file.name }}</span>
+              <button type="button" (click)="removeFile(file)" aria-label="Remove file">×</button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    @if (errorMessage()) {
+      <div style="background: var(--status-reopened-bg); color: var(--status-reopened); padding: 10px 14px; border-radius: var(--radius-md); font-size: 13px; margin-bottom: 16px;">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <div style="display:flex; gap:10px; justify-content:flex-end;">
+      <button type="button" class="btn btn-ghost" (click)="cancel()">Cancel</button>
+      <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+        @if (submitting()) { Creating… } @else { Submit Ticket }
+      </button>
+    </div>
+  </form>
+</div>

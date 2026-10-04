@@ -1,0 +1,56 @@
+.create-page { max-width: 720px; margin: 0 auto; padding: 28px 20px; }
+.page-title { font-size: 19px; font-weight: 700; color: var(--text-primary); }
+.page-sub { font-size: 12.5px; color: var(--text-secondary); margin-top: 2px; }
+
+.section-card { background: var(--surface-card); border: 1px solid var(--border-default); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px; }
+.section-card-ttl { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-default); }
+
+.form-grp { display: flex; flex-direction: column; }
+.form-lbl { display: block; font-size: 13px; font-weight: 500; color: var(--text-primary); margin-bottom: 6px; }
+.form-inp {
+  width: 100%; padding: 9px 12px; border: 1px solid var(--border-default); border-radius: var(--radius-md);
+  background: var(--surface-card); color: var(--text-primary); font-family: inherit; font-size: 13.5px; outline: none;
+  &:focus { border-color: var(--border-focus); box-shadow: var(--shadow-focus); }
+  &.invalid { border-color: var(--status-reopened); }
+}
+.field-error { font-size: 12px; color: var(--status-reopened); margin-top: 4px; }
+
+.form-select {
+  width: 100%; padding: 8px 30px 8px 10px; border: 1px solid var(--border-default); border-radius: var(--radius-md);
+  background: var(--surface-card); color: var(--text-primary); font-family: inherit; font-size: 13.5px; outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+  &:focus { border-color: var(--border-focus); box-shadow: var(--shadow-focus); }
+}
+
+.prio-selector { display: flex; gap: 8px; }
+.prio-opt {
+  flex: 1; border: 1.5px solid var(--border-default); border-radius: var(--radius-md); padding: 8px 10px;
+  cursor: pointer; text-align: center; font-size: 13px; font-weight: 500; background: var(--surface-card);
+  color: var(--text-primary); font-family: inherit;
+  &[data-p="LOW"].selected { border-color: var(--priority-low); background: var(--priority-low-bg); color: var(--priority-low); }
+  &[data-p="MEDIUM"].selected { border-color: var(--priority-medium); background: var(--priority-medium-bg); color: var(--priority-medium); }
+  &[data-p="HIGH"].selected { border-color: var(--priority-high); background: var(--priority-high-bg); color: var(--priority-high); }
+  &[data-p="URGENT"].selected { border-color: var(--priority-urgent); background: var(--priority-urgent-bg); color: var(--priority-urgent); }
+}
+
+.dropzone {
+  border: 2px dashed var(--border-default); border-radius: var(--radius-md); padding: 28px 20px;
+  text-align: center; cursor: pointer;
+  &:hover, &.drag-over { border-color: var(--primary-600); background: var(--primary-50); }
+}
+.dropzone-ico { width: 32px; height: 32px; color: var(--text-muted); margin: 0 auto 8px; }
+.dropzone-lbl { font-size: 13.5px; font-weight: 500; color: var(--text-primary); }
+.dropzone-hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+.file-chip-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.file-chip {
+  display: flex; align-items: center; gap: 6px; font-size: 12.5px; padding: 5px 10px;
+  background: var(--surface-hover); border: 1px solid var(--border-default); border-radius: var(--radius-full);
+  button { background: none; border: none; color: var(--text-muted); font-size: 15px; line-height: 1; cursor: pointer; padding: 0; &:hover { color: var(--status-reopened); } }
+}
+
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 0 14px; height: 36px; border-radius: var(--radius-md); font-size: 13px; font-weight: 500; border: 1px solid transparent; cursor: pointer; font-family: inherit; }
+.btn-primary { background: var(--primary-600); color: #fff; &:hover { background: var(--primary-700); } &:disabled { opacity: 0.6; cursor: not-allowed; } }
+.btn-ghost { background: transparent; color: var(--text-secondary); &:hover { background: var(--surface-hover); color: var(--text-primary); } }

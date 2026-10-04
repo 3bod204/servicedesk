@@ -1,0 +1,133 @@
+<div class="page-hdr">
+  <div>
+    <div class="page-title">Tickets</div>
+    <div class="page-sub">{{ totalElements() }} tickets</div>
+  </div>
+  <div style="display:flex; gap:10px;">
+    @if (canExport) {
+      <button class="btn btn-secondary" [disabled]="exporting()" (click)="exportCsv()">
+        @if (exporting()) { Exporting… } @else { Export CSV }
+      </button>
+    }
+    <button class="btn btn-primary" (click)="createTicket()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
+      New Ticket
+    </button>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <input type="text" class="flt-sel flt-search" placeholder="Search tickets…"
+    [(ngModel)]="filterSearch" (keyup.enter)="applyFilters()">
+
+  <button type="button" class="btn btn-secondary flt-toggle" [class.active]="filtersOpen()" (click)="toggleFilters()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M7 12h10M10 18h4"></path></svg>
+    Filters
+    @if (activeFilterCount > 0) {
+      <span class="flt-count">{{ activeFilterCount }}</span>
+    }
+  </button>
+
+  @if (activeFilterCount > 0) {
+    <a class="clear-link" href="#" (click)="clearFilters(); $event.preventDefault()">Clear filters</a>
+  }
+</div>
+
+@if (filtersOpen()) {
+  <div class="filter-panel">
+    <select class="flt-sel" [(ngModel)]="filterStatus" (change)="applyFilters()">
+      <option value="">All Statuses</option>
+      @for (s of allStatuses; track s) {
+        <option [value]="s">{{ statusLabel(s) }}</option>
+      }
+    </select>
+
+    <select class="flt-sel" [(ngModel)]="filterPriority" (change)="applyFilters()">
+      <option value="">All Priorities</option>
+      <option value="LOW">Low</option>
+      <option value="MEDIUM">Medium</option>
+      <option value="HIGH">High</option>
+      <option value="URGENT">Urgent</option>
+    </select>
+
+    <input type="date" class="flt-sel" [(ngModel)]="filterDateFrom" (change)="applyFilters()" title="Created from">
+    <input type="date" class="flt-sel" [(ngModel)]="filterDateTo" (change)="applyFilters()" title="Created to">
+
+    <select class="flt-sel" [(ngModel)]="filterQueueId" (change)="applyFilters()">
+      <option [ngValue]="''">All Queues</option>
+      @for (q of queues(); track q.id) {
+        <option [ngValue]="q.id">{{ q.name }}</option>
+      }
+    </select>
+
+    @if (canFilterByAssignee) {
+      <select class="flt-sel" [(ngModel)]="filterAssigneeId" (change)="applyFilters()">
+        <option [ngValue]="''">All Assignees</option>
+        @for (u of assignableUsers(); track u.id) {
+          <option [ngValue]="u.id">{{ u.fullName }}</option>
+        }
+      </select>
+    }
+
+    <label class="flt-check">
+      <input type="checkbox" [(ngModel)]="filterMineOnly" (change)="applyFilters()">
+      Assigned to me
+    </label>
+  </div>
+}
+
+@if (loading()) {
+  <div class="tbl-wrap"><div style="padding: 40px; text-align: center; color: var(--text-muted);">Loading tickets…</div></div>
+} @else if (errorMessage()) {
+  <div class="tbl-wrap"><div style="padding: 40px; text-align: center; color: var(--status-reopened);">{{ errorMessage() }}</div></div>
+} @else if (tickets().length === 0) {
+  <div class="tbl-wrap"><div style="padding: 40px; text-align: center; color: var(--text-muted);">No tickets found.</div></div>
+} @else {
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Ticket</th><th>Subject</th><th>Status</th><th>Priority</th><th>Assignee</th><th>Queue</th><th style="text-align:right">SLA</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (ticket of tickets(); track ticket.id) {
+          <tr (click)="openTicket(ticket.id)">
+            <td><div class="tkt-ref">{{ ticket.reference }}</div></td>
+            <td>
+              <div class="tkt-title">{{ ticket.title }}</div>
+              <div class="tkt-meta">{{ ticket.categoryName }} · {{ ticket.requesterName }}</div>
+            </td>
+            <td><span class="badge" [ngClass]="statusClass(ticket.status)">{{ statusLabel(ticket.status) }}</span></td>
+            <td>
+              <span class="prio" [ngClass]="priorityClass(ticket.priority)">
+                <span class="prio-dot" [ngClass]="priorityClass(ticket.priority)"></span>
+                {{ ticket.priority | titlecase }}
+              </span>
+            </td>
+            <td>
+              @if (ticket.assigneeName) {
+                <span style="font-size:12.5px;color:var(--text-primary);">{{ ticket.assigneeName }}</span>
+              } @else {
+                <span style="font-size:12px;color:var(--text-muted);">Unassigned</span>
+              }
+            </td>
+            <td><span style="font-size:12.5px;color:var(--text-secondary);">{{ ticket.queueName }}</span></td>
+            <td style="text-align:right">
+              <span class="sla-chip" [ngClass]="slaInfo(ticket).cssClass">{{ slaInfo(ticket).label }}</span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="paginav">
+      <div class="paginav-info">Showing {{ page() * pageSize + 1 }}–{{ page() * pageSize + tickets().length }} of {{ totalElements() }}</div>
+      <div class="paginav-btns">
+        <button class="pg-btn" [disabled]="page() === 0" (click)="prevPage()">‹</button>
+        <button class="pg-btn active">{{ page() + 1 }}</button>
+        <button class="pg-btn" [disabled]="(page() + 1) * pageSize >= totalElements()" (click)="nextPage()">›</button>
+      </div>
+    </div>
+  </div>
+}

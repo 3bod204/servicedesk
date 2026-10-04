@@ -1,0 +1,60 @@
+<div class="page-hdr">
+  <div>
+    <div class="page-title">Dashboard</div>
+    <div class="page-sub">Ticket metrics across your queues</div>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <input type="date" class="flt-sel" [(ngModel)]="dateFrom" (change)="applyFilters()">
+  <input type="date" class="flt-sel" [(ngModel)]="dateTo" (change)="applyFilters()">
+  <select class="flt-sel" [(ngModel)]="selectedQueueId" (change)="applyFilters()">
+    <option [ngValue]="null">All queues</option>
+    @for (q of queues(); track q.id) {
+      <option [value]="q.id">{{ q.name }}</option>
+    }
+  </select>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-lbl">Avg. First Response</div>
+    <div class="kpi-num">
+      @if (avgFirstResponse()?.averageMinutes != null) {
+        {{ (avgFirstResponse()!.averageMinutes! / 60) | number:'1.0-0' }}h
+      } @else { — }
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-lbl">Avg. Resolution Time</div>
+    <div class="kpi-num">
+      @if (avgResolution()?.averageMinutes != null) {
+        {{ (avgResolution()!.averageMinutes! / 60) | number:'1.0-0' }}h
+      } @else { — }
+    </div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-lbl">SLA Compliance</div>
+    <div class="kpi-num" [style.color]="(slaCompliance()?.compliancePercentage ?? 100) >= 90 ? 'var(--status-resolved)' : 'var(--status-reopened)'">
+      @if (slaCompliance()?.compliancePercentage != null) {
+        {{ slaCompliance()!.compliancePercentage! | number:'1.0-0' }}%
+      } @else { — }
+    </div>
+  </div>
+</div>
+
+<div class="charts-row">
+  <div class="chart-card">
+    <div class="chart-ttl">Tickets by Status</div>
+    <div class="chart-wrap"><canvas #statusCanvas></canvas></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-ttl">Tickets by Priority</div>
+    <div class="chart-wrap"><canvas #priorityCanvas></canvas></div>
+  </div>
+</div>
+
+<div class="chart-card" style="margin-top:16px;">
+  <div class="chart-ttl">Agent Workload</div>
+  <div class="chart-wrap" style="height:220px;"><canvas #workloadCanvas></canvas></div>
+</div>

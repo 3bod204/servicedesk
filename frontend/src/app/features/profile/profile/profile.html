@@ -1,0 +1,78 @@
+@if (loading()) {
+  <div style="padding: 40px; text-align: center; color: var(--text-muted);">Loading profile…</div>
+} @else if (user(); as u) {
+  <div class="profile-page">
+    <div class="profile-hdr">
+      @if (u.avatarUrl && !avatarFailed()) {
+        <img class="avatar-lg" [src]="u.avatarUrl" alt="" (error)="avatarFailed.set(true)">
+      } @else {
+        <div class="avatar-lg" style="background: var(--primary-600);">{{ initials }}</div>
+      }
+      <div>
+        <div class="profile-name">{{ u.fullName }}</div>
+        <div class="profile-role">
+          @for (role of u.roles; track role) {
+            <span class="role-chip">{{ roleLabel(role) }}</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-ttl">Profile Details</div>
+      <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+        <div class="form-grp">
+          <label class="form-lbl">Full Name</label>
+          <input class="form-inp" type="text" formControlName="fullName">
+        </div>
+        <div class="form-grp">
+          <label class="form-lbl">Avatar URL (optional)</label>
+          <input class="form-inp" type="text" formControlName="avatarUrl" placeholder="https://…">
+        </div>
+        <div class="form-grp">
+          <label class="form-lbl">Email</label>
+          <input class="form-inp" type="text" [value]="u.email" disabled>
+        </div>
+
+        @if (profileSuccess()) {
+          <div class="success-msg">Profile updated.</div>
+        }
+        @if (profileError()) {
+          <div class="error-msg">{{ profileError() }}</div>
+        }
+
+        <button type="submit" class="btn btn-primary" [disabled]="savingProfile()">
+          @if (savingProfile()) { Saving… } @else { Save Changes }
+        </button>
+      </form>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-ttl">Change Password</div>
+      <form [formGroup]="passwordForm" (ngSubmit)="savePassword()">
+        <div class="form-grp">
+          <label class="form-lbl">Current Password</label>
+          <input class="form-inp" type="password" formControlName="currentPassword">
+        </div>
+        <div class="form-grp">
+          <label class="form-lbl">New Password</label>
+          <input class="form-inp" type="password" formControlName="newPassword">
+          @if (passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched) {
+            <div class="field-error">At least 8 characters.</div>
+          }
+        </div>
+
+        @if (passwordSuccess()) {
+          <div class="success-msg">Password changed.</div>
+        }
+        @if (passwordError()) {
+          <div class="error-msg">{{ passwordError() }}</div>
+        }
+
+        <button type="submit" class="btn btn-primary" [disabled]="savingPassword()">
+          @if (savingPassword()) { Saving… } @else { Change Password }
+        </button>
+      </form>
+    </div>
+  </div>
+}

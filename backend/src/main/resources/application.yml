@@ -1,23 +1,39 @@
 spring:
   application:
-    name: taskforge-backend
-  datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/servicedesk}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
+    name: servicedesk
   jpa:
     hibernate:
       ddl-auto: validate
     open-in-view: false
-  h2:
-    console:
-      enabled: false
+  flyway:
+    enabled: true
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
 
 server:
-  port: ${SERVER_PORT:8080}
+  port: 8080
 
 management:
   endpoints:
     web:
       exposure:
         include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    access-token-minutes: 15
+    refresh-token-days: 7
+  storage:
+    bucket: ${STORAGE_BUCKET}
+    endpoint: ${STORAGE_ENDPOINT}
+    access-key: ${STORAGE_ACCESS_KEY}
+    secret-key: ${STORAGE_SECRET_KEY}
+    region: ${STORAGE_REGION:us-east-1}
+
+shedlock:
+  defaults-lock-at-most-for: 10m

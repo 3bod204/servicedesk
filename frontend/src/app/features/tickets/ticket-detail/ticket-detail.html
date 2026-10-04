@@ -1,0 +1,225 @@
+@if (loading()) {
+  <div style="padding: 40px; text-align: center; color: var(--text-muted);">Loading ticket…</div>
+} @else if (errorMessage() && !ticket()) {
+  <div style="padding: 40px; text-align: center; color: var(--status-reopened);">{{ errorMessage() }}</div>
+} @else if (ticket(); as t) {
+  <div class="detail-grid">
+    <!-- Left column -->
+    <div>
+      <div class="detail-title">{{ t.title }}</div>
+      <div class="detail-meta">
+        <span class="sd-mono" style="font-size:12px;color:var(--text-link);">{{ t.reference }}</span>
+        <span class="badge" [ngClass]="statusClass(t.status)">{{ statusLabel(t.status) }}</span>
+        <span class="prio" [ngClass]="priorityClass(t.priority)">
+          <span class="prio-dot" [ngClass]="priorityClass(t.priority)"></span>{{ t.priority | titlecase }}
+        </span>
+        <span class="meta-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg>
+          Opened {{ t.createdAt | date:'d MMM, HH:mm' }}
+        </span>
+        <span class="meta-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+          {{ t.requesterName }}
+        </span>
+      </div>
+
+      @if (errorMessage() && ticket()) {
+        <div style="background: var(--status-reopened-bg); color: var(--status-reopened); padding: 10px 14px; border-radius: var(--radius-md); font-size: 13px; margin-bottom: 14px;">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <div class="card">
+        <div class="card-hdr"><span class="card-lbl">Description</span></div>
+        <div class="card-body"><div class="desc-text">{{ t.description }}</div></div>
+      </div>
+
+      <div class="card" style="padding:0">
+        <div class="card-hdr">
+          <span class="card-lbl">Activity</span>
+          <span style="font-size:12px;color:var(--text-muted);">{{ comments().length }} comment{{ comments().length !== 1 ? 's' : '' }}</span>
+        </div>
+
+        @if (comments().length === 0) {
+          <div class="comment"><div class="cmt-body" style="font-size:13px;color:var(--text-muted);">No comments yet.</div></div>
+        }
+        @for (thread of threadedComments(); track thread.comment.id) {
+          <div class="comment" [class.internal]="thread.comment.internal">
+            <div class="av av-sm av-blue">{{ thread.comment.authorName.slice(0,2).toUpperCase() }}</div>
+            <div class="cmt-body">
+              <div class="cmt-hdr">
+                <span class="cmt-author">{{ thread.comment.authorName }}</span>
+                <span class="cmt-time">{{ thread.comment.createdAt | date:'short' }}</span>
+                @if (thread.comment.internal) { <span class="int-label">Internal note</span> }
+              </div>
+              <div class="cmt-text">{{ thread.comment.body }}</div>
+              <button class="reply-link" (click)="startReply(thread.comment)">Reply</button>
+            </div>
+          </div>
+
+          @for (reply of thread.replies; track reply.id) {
+            <div class="comment comment-reply" [class.internal]="reply.internal">
+              <div class="av av-sm av-blue">{{ reply.authorName.slice(0,2).toUpperCase() }}</div>
+              <div class="cmt-body">
+                <div class="cmt-hdr">
+                  <span class="cmt-author">{{ reply.authorName }}</span>
+                  <span class="cmt-time">{{ reply.createdAt | date:'short' }}</span>
+                  @if (reply.internal) { <span class="int-label">Internal note</span> }
+                </div>
+                <div class="cmt-text">{{ reply.body }}</div>
+              </div>
+            </div>
+          }
+        }
+
+        <div class="cmt-form">
+          @if (replyingTo(); as target) {
+            <div class="reply-chip">
+              Replying to <strong>{{ target.authorName }}</strong>
+              <button (click)="cancelReply()" aria-label="Cancel reply">×</button>
+            </div>
+          }
+          <div class="cmt-type-row">
+            <button class="type-pill" [class.active-pub]="!commentInternal" (click)="commentInternal = false">Public reply</button>
+            @if (!isRequesterOnly) {
+              <button class="type-pill" [class.active-int]="commentInternal" (click)="commentInternal = true">Internal note</button>
+            }
+          </div>
+          <textarea class="cmt-ta" [(ngModel)]="commentBody" placeholder="Write a reply…"></textarea>
+          <div class="cmt-form-foot">
+            <button class="btn btn-primary btn-sm" [disabled]="postingComment() || !commentBody.trim()" (click)="submitComment()">Submit reply</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr">
+          <span class="card-lbl">Attachments</span>
+          <label class="btn btn-ghost btn-sm" style="font-size:12px; cursor:pointer;">
+            @if (uploadingFile()) { Uploading… } @else { + Upload }
+            <input type="file" style="display:none;" (change)="onFileSelected($event)" [disabled]="uploadingFile()">
+          </label>
+        </div>
+        <div class="card-body">
+          @if (attachments().length === 0) {
+            <div style="font-size:13px;color:var(--text-muted);">No attachments</div>
+          }
+          @for (a of attachments(); track a.id) {
+            <div class="att-item" style="cursor: default;">
+              <div class="att-icon">
+                @switch (fileIconType(a.contentType)) {
+                  @case ('image') {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path>
+                    </svg>
+                  }
+                  @case ('pdf') {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M9 13h6M9 17h3"></path>
+                    </svg>
+                  }
+                  @default {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline>
+                    </svg>
+                  }
+                }
+              </div>
+              <div style="flex-grow:1;">
+                <div class="att-name">{{ a.filename }}</div>
+                <div class="att-meta">{{ (a.sizeBytes / 1024) | number:'1.0-0' }} KB · {{ a.uploadedByName }}</div>
+              </div>
+              <button class="icon-btn" (click)="downloadAttachment(a)" title="Download">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              </button>
+              @if (canDeleteAttachment(a)) {
+                <button class="icon-btn" (click)="deleteAttachment(a)" title="Delete">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path></svg>
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Right column -->
+    <div class="info-panel">
+      <div class="info-card">
+        <div class="info-sec">
+          <div class="info-lbl">Status</div>
+          <select class="info-sel" [ngModel]="draftStatus()" (ngModelChange)="draftStatus.set($event)" [disabled]="statusLocked() || savingChanges()">
+            @for (s of availableStatuses(); track s) {
+              <option [value]="s">{{ statusLabel(s) }}</option>
+            }
+          </select>
+          @if (statusLocked()) {
+            <div class="info-hint">Assign this ticket first to move it out of New.</div>
+          }
+        </div>
+        <div class="info-sec">
+          <div class="info-lbl">Assignee</div>
+          @if (!isRequesterOnly) {
+            <select class="info-sel" [ngModel]="draftAssigneeId()" (ngModelChange)="draftAssigneeId.set($event)" [disabled]="savingChanges()">
+              <option [ngValue]="null" disabled>Select an assignee…</option>
+              @for (member of queueMembers(); track member.id) {
+                <option [value]="member.id">{{ member.fullName }}</option>
+              }
+            </select>
+          } @else if (t.assigneeName) {
+            <div class="info-person">
+              <div class="av av-sm av-blue">{{ t.assigneeName.slice(0,2).toUpperCase() }}</div>
+              <div><div class="info-person-name">{{ t.assigneeName }}</div></div>
+            </div>
+          } @else {
+            <span style="font-size:13px;color:var(--text-muted);">Unassigned</span>
+          }
+        </div>
+        @if (!isRequesterOnly) {
+          <div class="info-sec">
+            <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center;" [disabled]="!isDirty() || savingChanges()" (click)="saveDetails()">
+              @if (savingChanges()) { Saving… } @else { Save }
+            </button>
+          </div>
+        }
+        <div class="info-sec">
+          <div class="info-lbl">Requester</div>
+          <div class="info-person">
+            <div class="av av-sm av-blue">{{ t.requesterName.slice(0,2).toUpperCase() }}</div>
+            <div><div class="info-person-name">{{ t.requesterName }}</div></div>
+          </div>
+        </div>
+        <div class="info-sec"><div class="info-lbl">Category</div><div class="info-val">{{ t.categoryName }}</div></div>
+        <div class="info-sec"><div class="info-lbl">Queue</div><div class="info-val">{{ t.queueName }}</div></div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-sec" style="border-bottom:none">
+          <div class="info-lbl">SLA Due</div>
+          <div class="sla-time" [ngClass]="slaInfo().cssClass">{{ slaInfo().label }}</div>
+          <div class="sla-bar-track"><div class="sla-bar" [ngClass]="slaInfo().cssClass" [style.width.%]="slaInfo().percent"></div></div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-sec" style="border-bottom:none">
+          <div class="info-lbl" style="margin-bottom:10px;">Audit Log</div>
+          @if (audit().length === 0) {
+            <div style="font-size:12px;color:var(--text-muted);">No history yet.</div>
+          }
+          @for (entry of audit(); track entry.id) {
+            <div class="audit-row">
+              <div class="audit-dot"></div>
+              <div>
+                <div class="audit-desc">
+                  {{ entry.field }}: {{ formatAuditValue(entry.field, entry.oldValue) }} → {{ formatAuditValue(entry.field, entry.newValue) }}
+                </div>
+                <div class="audit-t">{{ entry.actorName }} · {{ entry.createdAt | date:'short' }}</div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}

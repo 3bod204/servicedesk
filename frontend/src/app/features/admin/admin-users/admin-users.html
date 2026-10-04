@@ -1,0 +1,129 @@
+<div class="page-hdr">
+  <div>
+    <div class="page-title">Users</div>
+    <div class="page-sub">{{ users().length }} {{ users().length === 1 ? 'user' : 'users' }}</div>
+  </div>
+  <button class="btn btn-primary" (click)="toggleCreateForm()">
+    @if (showCreateForm()) {
+      Cancel
+    } @else {
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+      New User
+    }
+  </button>
+</div>
+
+@if (errorMessage()) {
+  <div class="alert-error">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v5M12 16h.01"></path></svg>
+    {{ errorMessage() }}
+  </div>
+}
+
+@if (showCreateForm()) {
+  <div class="section-card">
+    <div class="section-card-ttl">New User</div>
+    <form [formGroup]="createForm" (ngSubmit)="submitCreate()">
+      <div class="form-row">
+        <div class="form-grp">
+          <label class="form-lbl">Email <span class="req">*</span></label>
+          <input class="form-inp" type="email" formControlName="email" placeholder="name@company.com">
+        </div>
+        <div class="form-grp">
+          <label class="form-lbl">Full Name <span class="req">*</span></label>
+          <input class="form-inp" type="text" formControlName="fullName" placeholder="Jane Doe">
+        </div>
+      </div>
+      <div class="form-grp">
+        <label class="form-lbl">Temporary Password <span class="req">*</span></label>
+        <input class="form-inp" type="password" formControlName="password" placeholder="Min. 8 characters">
+      </div>
+      <div class="form-grp">
+        <label class="form-lbl">Roles <span class="req">*</span></label>
+        <div formArrayName="roleNames" class="role-opt-group">
+          @for (role of availableRoles; track role; let i = $index) {
+            <label class="role-opt" [attr.data-role]="role">
+              <input type="checkbox" [formControlName]="i">
+              <span>{{ roleLabel(role) }}</span>
+            </label>
+          }
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" (click)="toggleCreateForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="creating()">
+          @if (creating()) { Creating… } @else { Create User }
+        </button>
+      </div>
+    </form>
+  </div>
+}
+
+@if (loading()) {
+  <div class="loading-state">Loading users…</div>
+} @else {
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>User</th><th>Roles</th><th>Status</th><th></th></tr>
+      </thead>
+      <tbody>
+        @for (user of users(); track user.id) {
+          <tr>
+            <td>
+              <div class="user-cell">
+                @if (user.avatarUrl && !failedAvatarUrls().has(user.avatarUrl)) {
+                  <img class="av" [src]="user.avatarUrl" alt="" (error)="markAvatarFailed(user.avatarUrl)">
+                } @else {
+                  <div class="av" [ngClass]="avatarClass(user.fullName)">{{ initials(user.fullName) }}</div>
+                }
+                <div>
+                  <div class="user-name">{{ user.fullName }}</div>
+                  <div class="user-email">{{ user.email }}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              @if (editingUserId() === user.id) {
+                <div class="role-opt-group role-opt-group-inline">
+                  @for (role of availableRoles; track role) {
+                    <label class="role-opt role-opt-sm" [attr.data-role]="role">
+                      <input type="checkbox" [checked]="editingRoles().has(role)" (change)="toggleEditRole(role)">
+                      <span>{{ roleLabel(role) }}</span>
+                    </label>
+                  }
+                  <div class="edit-roles-actions">
+                    <button class="btn btn-primary btn-sm" (click)="saveRoles(user.id)">Save</button>
+                    <button class="btn btn-secondary btn-sm" (click)="cancelEditRoles()">Cancel</button>
+                  </div>
+                </div>
+              } @else {
+                @for (role of user.roles; track role) {
+                  <span class="role-chip" [attr.data-role]="role">{{ roleLabel(role) }}</span>
+                }
+              }
+            </td>
+            <td>
+              <span class="badge" [ngClass]="user.active ? 'b-resolved' : 'b-closed'">
+                <span class="badge-dot"></span>
+                {{ user.active ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td class="actions-cell">
+              @if (editingUserId() !== user.id) {
+                <button class="btn btn-secondary btn-sm" (click)="startEditRoles(user)">Edit Roles</button>
+                <button class="btn btn-secondary btn-sm" (click)="toggleActive(user)">
+                  {{ user.active ? 'Deactivate' : 'Activate' }}
+                </button>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4" class="empty-cell">No users yet.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

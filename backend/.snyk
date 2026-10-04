@@ -1,0 +1,723 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.5.0
+ignore:
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-20302843:
+    - '*':
+        reason: >-
+          CVE-2026-68525: fixed only in tomcat-embed-core 10.1.59, not yet
+          published to Maven Central as of 2026-10-04 (verified; latest
+          available is 10.1.54, which we already run). The flaw is in
+          Tomcat's container-managed FORM authentication bypassing a
+          GET/POST security-constraint - this app uses Spring Security's
+          JWT filter chain exclusively, not Tomcat FORM auth or
+          web.xml-style security constraints, so the vector doesn't apply
+          here regardless. Revisit once 10.1.59+ is released.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-20302889:
+    - '*':
+        reason: >-
+          CVE-2026-68569: same as -20302843, fixed only in 10.1.59 (not yet
+          on Maven Central). Affects Tomcat's DataSourceRealm with
+          CLIENT-CERT/SPNEGO authentication; this app has no Tomcat Realm
+          configured and uses JWT auth instead, so it isn't exposed.
+          Revisit once 10.1.59+ is released.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-20304748:
+    - '*':
+        reason: >-
+          CVE-2026-68763: same as -20302843, fixed only in 10.1.59 (not yet
+          on Maven Central). Resource exhaustion via HTTP/2 stream reset
+          backlog tracking; this app doesn't enable HTTP/2 on the embedded
+          Tomcat connector. Revisit once 10.1.59+ is released.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-COMFASTERXMLJACKSONCORE-20059179:
+    - '*':
+        reason: >-
+          No released version fixes this: introduced by flyway-core's
+          jackson-dataformat-toml dependency on jackson-core@2.17.2.
+          Same as the other jackson findings here - no published Maven
+          Central release actually fixes it (verified 2026-09-27); real
+          fix requires bumping flyway-core to a newer major version,
+          tracked as a separate upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-COMFASTERXMLJACKSONCORE-20059683:
+    - '*':
+        reason: >-
+          No released version fixes this: Snyk lists 2.18.11/2.21.7/2.22.3
+          as fixed versions, but none exist on Maven Central as of
+          2026-09-27 (latest real jackson-databind release is 2.19.0,
+          which remains vulnerable). Introduced via jjwt-jackson's
+          jackson-databind dependency. Revisit once Jackson ships a real
+          fix.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-COMFASTERXMLJACKSONCORE-15365924:
+    - '*':
+        reason: >-
+          No released version fixes this: com.fasterxml.jackson.core is
+          already pinned via Spring Boot's jackson-bom (2.17.2), and none of
+          the versions Snyk lists as fixing it (e.g. 2.18.8, 2.18.10, 2.21.4)
+          have actually been published to Maven Central as of 2026-09-15 -
+          the latest real jackson-databind/jackson-core release is 2.19.0,
+          which remains vulnerable. Revisit once Jackson ships a real fix.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-COMFASTERXMLJACKSONCORE-15907551:
+    - '*':
+        reason: >-
+          No released version fixes this: com.fasterxml.jackson.core is
+          already pinned via Spring Boot's jackson-bom (2.17.2), and none of
+          the versions Snyk lists as fixing it (e.g. 2.18.8, 2.18.10, 2.21.4)
+          have actually been published to Maven Central as of 2026-09-15 -
+          the latest real jackson-databind/jackson-core release is 2.19.0,
+          which remains vulnerable. Revisit once Jackson ships a real fix.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-COMFASTERXMLJACKSONCORE-17440366:
+    - '*':
+        reason: >-
+          No released version fixes this: com.fasterxml.jackson.core is
+          already pinned via Spring Boot's jackson-bom (2.17.2), and none of
+          the versions Snyk lists as fixing it (e.g. 2.18.8, 2.18.10, 2.21.4)
+          have actually been published to Maven Central as of 2026-09-15 -
+          the latest real jackson-databind/jackson-core release is 2.19.0,
+          which remains vulnerable. Revisit once Jackson ships a real fix.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-COMFASTERXMLJACKSONCORE-17440598:
+    - '*':
+        reason: >-
+          No released version fixes this: com.fasterxml.jackson.core is
+          already pinned via Spring Boot's jackson-bom (2.17.2), and none of
+          the versions Snyk lists as fixing it (e.g. 2.18.8, 2.18.10, 2.21.4)
+          have actually been published to Maven Central as of 2026-09-15 -
+          the latest real jackson-databind/jackson-core release is 2.19.0,
+          which remains vulnerable. Revisit once Jackson ships a real fix.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-COMFASTERXMLJACKSONCORE-18517159:
+    - '*':
+        reason: >-
+          No released version fixes this: com.fasterxml.jackson.core is
+          already pinned via Spring Boot's jackson-bom (2.17.2), and none of
+          the versions Snyk lists as fixing it (e.g. 2.18.8, 2.18.10, 2.21.4)
+          have actually been published to Maven Central as of 2026-09-15 -
+          the latest real jackson-databind/jackson-core release is 2.19.0,
+          which remains vulnerable. Revisit once Jackson ships a real fix.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-COMFASTERXMLJACKSONCORE-19778370:
+    - '*':
+        reason: >-
+          No released version fixes this: com.fasterxml.jackson.core is
+          already pinned via Spring Boot's jackson-bom (2.17.2), and none of
+          the versions Snyk lists as fixing it (e.g. 2.18.8, 2.18.10, 2.21.4)
+          have actually been published to Maven Central as of 2026-09-15 -
+          the latest real jackson-databind/jackson-core release is 2.19.0,
+          which remains vulnerable. Revisit once Jackson ships a real fix.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-CHQOSLOGBACK-17675439:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-IOMICROMETER-17260885:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-IOMICROMETER-19233327:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-IOMICROMETER-19256585:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHECOMMONS-10734078:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-10365122:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-10674391:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-10676855:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-11799152:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-13733966:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-13746602:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-15307781:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-15307822:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-15989808:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-15989820:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-15990633:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-16643259:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-16691231:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-17732890:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-17733746:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-17733813:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-8383920:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-8523186:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-8547999:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-9396739:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-9905132:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGPOSTGRESQL-10343494:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGPOSTGRESQL-16321668:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGPOSTGRESQL-17874248:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORK-12008931:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORK-12817817:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORK-15701845:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORK-16109615:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORK-17253311:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORK-17254116:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORK-17254527:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORK-17254544:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORK-18326606:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORK-19267072:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORK-19267073:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORK-19267075:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORK-19267077:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORK-19267078:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORK-19267098:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORK-19267438:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORK-8230373:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORKBOOT-15701835:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORKBOOT-15701836:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORKBOOT-16191022:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORKBOOT-16191649:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORKBOOT-16198880:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORKBOOT-16200231:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORKDATA-17279540:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORKDATA-17304742:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORKDATA-17308778:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORKSECURITY-15701796:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORKSECURITY-17305998:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORKSECURITY-19267391:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORKSECURITY-19267441:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORKSECURITY-8309135:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORKSECURITY-9486467:
+    - '*':
+        reason: >-
+          Transitively pinned by the spring-boot-starter-parent 3.3.4 BOM
+          (Spring Framework/Security/Data/Boot, embedded Tomcat, Micrometer,
+          Logback, or the Postgres driver). Fixing requires bumping the parent
+          BOM to a current 3.3.x/3.4.x release rather than overriding
+          individual artifact versions in isolation; tracked as a separate
+          upgrade task.
+        expires: 2026-12-15T00:00:00.000Z
+patch: {}

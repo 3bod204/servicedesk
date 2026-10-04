@@ -1,0 +1,7 @@
+package com.tcc.servicedesk.user.dto;
+
+import jakarta.validation.constraints.NotEmpty;
+import java.util.Set;
+
+public record UpdateRolesRequest(
+        @NotEmpty(message = "At least one role is required") Set<String> roleNames) {}

@@ -1,0 +1,13 @@
+@use 'bootstrap/scss/bootstrap';
+@use 'styles/tokens';
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--surface-page);
+  color: var(--text-primary);
+}
+
+.sd-mono {
+  font-family: var(--font-mono);
+}
