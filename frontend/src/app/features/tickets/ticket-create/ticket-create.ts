@@ -4,7 +4,7 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { TicketService } from '../../../core/services/ticket.service';
-import { AttachmentService } from '../../../core/services/attachment.service';
+import { AttachmentService } from '../attachment.service';
 import { CategoryResponse } from '../../../shared/models/category.model';
 import { Priority } from '../../../shared/models/ticket.model';
 

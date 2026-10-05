@@ -1,8 +1,8 @@
 import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AdminService } from '../../../core/services/admin.service';
-import { AdminQueue, AdminCategory, SlaPolicy } from '../../../shared/models/admin.model';
+import { AdminService } from '../admin.service';
+import { AdminQueue, AdminCategory, SlaPolicy } from '../admin.model';
 
 type Tab = 'queues' | 'categories' | 'sla';
 const PRIORITY_ORDER = ['URGENT', 'HIGH', 'MEDIUM', 'LOW'];

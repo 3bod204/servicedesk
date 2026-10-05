@@ -1,6 +1,6 @@
 package com.tcc.servicedesk.user;
 
-import com.tcc.servicedesk.ticket.Queue;
+import com.tcc.servicedesk.ticket.queue.Queue;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
