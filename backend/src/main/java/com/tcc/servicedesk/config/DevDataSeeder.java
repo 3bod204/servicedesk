@@ -1,16 +1,16 @@
 package com.tcc.servicedesk.config;
 
-import com.tcc.servicedesk.ticket.Category;
-import com.tcc.servicedesk.ticket.CategoryRepository;
 import com.tcc.servicedesk.ticket.Priority;
-import com.tcc.servicedesk.ticket.Queue;
-import com.tcc.servicedesk.ticket.QueueRepository;
-import com.tcc.servicedesk.ticket.SlaPolicy;
-import com.tcc.servicedesk.ticket.SlaPolicyRepository;
 import com.tcc.servicedesk.ticket.Ticket;
 import com.tcc.servicedesk.ticket.TicketReferenceGenerator;
 import com.tcc.servicedesk.ticket.TicketRepository;
 import com.tcc.servicedesk.ticket.TicketStatus;
+import com.tcc.servicedesk.ticket.queue.Category;
+import com.tcc.servicedesk.ticket.queue.CategoryRepository;
+import com.tcc.servicedesk.ticket.queue.Queue;
+import com.tcc.servicedesk.ticket.queue.QueueRepository;
+import com.tcc.servicedesk.ticket.sla.SlaPolicy;
+import com.tcc.servicedesk.ticket.sla.SlaPolicyRepository;
 import com.tcc.servicedesk.user.Role;
 import com.tcc.servicedesk.user.RoleRepository;
 import com.tcc.servicedesk.user.User;

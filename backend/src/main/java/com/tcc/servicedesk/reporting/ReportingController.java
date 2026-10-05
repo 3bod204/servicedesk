@@ -1,5 +1,11 @@
 package com.tcc.servicedesk.reporting;
 
+import com.tcc.servicedesk.reporting.dto.AgentWorkload;
+import com.tcc.servicedesk.reporting.dto.AverageTimeMetric;
+import com.tcc.servicedesk.reporting.dto.PriorityCount;
+import com.tcc.servicedesk.reporting.dto.ReportCriteria;
+import com.tcc.servicedesk.reporting.dto.SlaComplianceMetric;
+import com.tcc.servicedesk.reporting.dto.StatusCount;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
