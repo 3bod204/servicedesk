@@ -1,7 +1,7 @@
 package com.tcc.servicedesk.auth;
 
 import com.tcc.servicedesk.auth.dto.LoginRequest;
-import com.tcc.servicedesk.auth.dto.LoginResponce;
+import com.tcc.servicedesk.auth.dto.LoginResponse;
 import com.tcc.servicedesk.auth.dto.RefreshRequest;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,12 +20,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public LoginResponce login(@Valid @RequestBody LoginRequest request) {
+    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
     }
 
     @PostMapping("/refresh")
-    public LoginResponce refresh(@Valid @RequestBody RefreshRequest request) {
+    public LoginResponse refresh(@Valid @RequestBody RefreshRequest request) {
         return authService.refresh(request);
     }
 

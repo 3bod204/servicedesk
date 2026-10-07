@@ -1,7 +1,7 @@
 package com.tcc.servicedesk.auth;
 
 import com.tcc.servicedesk.auth.dto.LoginRequest;
-import com.tcc.servicedesk.auth.dto.LoginResponce;
+import com.tcc.servicedesk.auth.dto.LoginResponse;
 import com.tcc.servicedesk.auth.dto.RefreshRequest;
 import com.tcc.servicedesk.security.JwtService;
 import com.tcc.servicedesk.security.UserPrincipal;
@@ -44,7 +44,7 @@ public class AuthService {
         this.loginAttemptRepository = loginAttemptRepository;
     }
 
-    public LoginResponce login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
 
         checkRateLimit(request.email());
 
@@ -81,7 +81,7 @@ public class AuthService {
 
         refreshTokenRepository.save(refreshTokenEntity);
 
-        return new LoginResponce(
+        return new LoginResponse(
                 accessToken, rawRefreshToken, user.getId(), user.getFullName(), user.getEmail());
     }
 
@@ -108,7 +108,7 @@ public class AuthService {
         loginAttemptRepository.save(attempt);
     }
 
-    public LoginResponce refresh(RefreshRequest request) {
+    public LoginResponse refresh(RefreshRequest request) {
 
         String submittedToken = request.refreshToken();
 
@@ -138,7 +138,7 @@ public class AuthService {
 
         String newAccessToken = jwtService.generateAccessToken(user.getEmail());
 
-        return new LoginResponce(
+        return new LoginResponse(
                 newAccessToken, submittedToken, user.getId(), user.getFullName(), user.getEmail());
     }
 

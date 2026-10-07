@@ -1,5 +1,11 @@
 package com.tcc.servicedesk.reporting;
 
+import com.tcc.servicedesk.reporting.dto.AgentWorkload;
+import com.tcc.servicedesk.reporting.dto.AverageTimeMetric;
+import com.tcc.servicedesk.reporting.dto.PriorityCount;
+import com.tcc.servicedesk.reporting.dto.ReportCriteria;
+import com.tcc.servicedesk.reporting.dto.SlaComplianceMetric;
+import com.tcc.servicedesk.reporting.dto.StatusCount;
 import com.tcc.servicedesk.ticket.Priority;
 import com.tcc.servicedesk.ticket.Ticket;
 import com.tcc.servicedesk.ticket.TicketRepository;

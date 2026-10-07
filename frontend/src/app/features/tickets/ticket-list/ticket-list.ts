@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TicketService } from '../../../core/services/ticket.service';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { UserService } from '../../../core/services/user.service';
 import { TicketResponse, TicketStatus, Priority, TicketSearchCriteria } from '../../../shared/models/ticket.model';
 import { QueueResponse } from '../../../shared/models/queue.model';

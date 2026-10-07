@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { Chart, registerables } from 'chart.js';
-import { ReportingService } from '../../core/services/reporting.service';
+import { ReportingService } from './reporting.service';
 import { TicketService } from '../../core/services/ticket.service';
 import {
   StatusCount, PriorityCount, AverageTimeMetric, SlaComplianceMetric, AgentWorkload, ReportCriteria
-} from '../../shared/models/reporting.model';
+} from './reporting.model';
 import { QueueResponse } from '../../shared/models/queue.model';
 
 Chart.register(...registerables);

@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { TicketService } from '../../../core/services/ticket.service';
-import { CommentService } from '../../../core/services/comment.service';
-import { AttachmentService } from '../../../core/services/attachment.service';
+import { CommentService } from '../comment.service';
+import { AttachmentService } from '../attachment.service';
 import { UserService } from '../../../core/services/user.service';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { TicketResponse, TicketStatus } from '../../../shared/models/ticket.model';
-import { CommentResponse } from '../../../shared/models/comment.model';
-import { AttachmentResponse } from '../../../shared/models/attachment.model';
+import { CommentResponse } from '../comment.model';
+import { AttachmentResponse } from '../attachment.model';
 import { AuditEntryResponse } from '../../../shared/models/audit.model';
 import { UserResponse } from '../../../shared/models/user.model';
 
